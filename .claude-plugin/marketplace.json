@@ -1,0 +1,23 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "btcd-cc-marketplace",
+  "description": "A marketplace for internal BTCD plugins.",
+  "owner": {
+    "name": "Hunter Prendergast",
+    "email": "hunter.prendergast@btcd.fi"
+  },
+  "plugins": [
+    {
+      "name": "claude-optimize",
+      "description": "Meta-plugin for recursive self-improvement of Claude Code environments. Provides 10 optimization modes (init, audit, security, context, skills, hooks, memory, mcp, report, loop, discovery) for analyzing and improving your Claude Code setup with scored dimensions and guided autonomous optimization.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Hunter Prendergast",
+        "email": "hunter.prendergast@btcd.fi"
+      },
+      "source": "./plugins/claude-optimize",
+      "category": "productivity",
+      "homepage": "https://btcd.fi"
+    }
+  ]
+}
