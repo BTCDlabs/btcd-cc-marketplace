@@ -1,6 +1,6 @@
 # claude-optimize
 
-Meta-plugin for recursive self-improvement of Claude Code environments. Provides 10 optimization modes for analyzing and improving your Claude Code setup.
+Meta-plugin for recursive self-improvement of Claude Code environments. Provides 11 optimization modes for analyzing and improving your Claude Code setup.
 
 ## Quick Start
 
@@ -25,6 +25,7 @@ Meta-plugin for recursive self-improvement of Claude Code environments. Provides
 | `/optimize:mcp` | MCP server management - health, security, recommendations |
 | `/optimize:report` | Comprehensive report across all dimensions |
 | `/optimize:loop` | Guided autonomous optimization loop |
+| `/optimize:discover` | Reflect on usage patterns to discover new capabilities and prune unused ones |
 
 ## Scoring System
 
@@ -64,7 +65,7 @@ The `/optimize:loop` command runs a guided autonomous optimization cycle:
 
 Inside a Claude Code session:
 ```
-/plugin install claude-optimize@claude-plugins-official
+/plugin install claude-optimize@btcd-cc-marketplace
 ```
 
 Or browse to it via `/plugin` > **Discover** tab.
@@ -73,7 +74,7 @@ Or browse to it via `/plugin` > **Discover** tab.
 
 Load the plugin directly for a single session:
 ```bash
-claude --plugin-dir /path/to/claude-plugins-official/plugins/claude-optimize
+claude --plugin-dir /path/to/btcd-cc-marketplace/plugins/claude-optimize
 ```
 
 ### Verify installation
