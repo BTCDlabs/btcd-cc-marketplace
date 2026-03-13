@@ -10,7 +10,7 @@ This repository hosts Claude Code plugins developed and maintained by BTCD. Plug
 
 | Plugin | Version | Description |
 |--------|---------|-------------|
-| [claude-optimize](plugins/claude-optimize/) | 0.3.2 | Meta-plugin for recursive self-improvement of Claude Code environments. Provides 11 optimization modes for analyzing and improving your setup. |
+| [claude-optimize](plugins/claude-optimize/) | 0.3.3 | Meta-plugin for recursive self-improvement of Claude Code environments. Provides 11 optimization modes for analyzing and improving your setup. |
 
 ## Installation
 

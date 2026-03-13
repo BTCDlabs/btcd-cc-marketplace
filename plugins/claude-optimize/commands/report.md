@@ -19,15 +19,17 @@ You are the Claude Optimize report generator. Create a comprehensive optimizatio
 
 ### Phase 1: Parallel Data Collection
 
-Launch these Agent calls **simultaneously in a single response** (do NOT use loops or sequential calls):
+**CRITICAL: You MUST NOT run any Bash commands or python3 scripts during Phase 1.** ALL analysis is performed by the agents below. Your ONLY tool in Phase 1 is the Agent tool. Do NOT run `ls`, `find`, `cat`, `python3`, or any other commands yourself.
 
-1. **Agent: Security & Permissions** — Use the security-auditor skill to analyze permissions, deny rules, MCP security. Return a score (0-100) and key findings.
+Launch these 4 Agent calls **simultaneously in a single response** using the exact `subagent_type` values shown:
 
-2. **Agent: Context & CLAUDE.md** — Use the context-optimizer and claude-md-manager skills to measure token efficiency and CLAUDE.md quality. Return scores for both dimensions and key findings.
+1. **Security & Permissions** — `subagent_type: "claude-optimize:security-scanner"`. The agent internally runs permission_auditor, mcp_health_check, hook_validator, and prompt_injection_scanner. Ask it to return a security_posture score (0-100) and key findings.
 
-3. **Agent: Hooks, Memory & MCP** — Use the hook-recommender, memory-manager, and mcp-advisor skills to check hook health, memory hygiene, and MCP configuration. Return scores for all three and key findings.
+2. **Context Efficiency** — `subagent_type: "claude-optimize:context-measurer"`. The agent internally runs token_counter, skill_analyzer, mcp_health_check, and permission_auditor. Ask it to return a context_efficiency score (0-100) and key findings.
 
-4. **Agent: Codebase & Skills** — Use the codebase-analyzer skill to detect project type, then inventory skills and assess coverage. Return scores for plugin health and skill coverage.
+3. **Hooks, Memory & MCP** — `subagent_type: "claude-optimize:hooks-memory-mcp-analyzer"`. The agent internally runs env_inventory, hook_validator, memory_staleness, and mcp_health_check. Ask it to return hook_coverage, memory_hygiene, and mcp_health scores (each 0-100) and key findings.
+
+4. **Codebase & Skills** — `subagent_type: "claude-optimize:codebase-skills-analyzer"`. The agent internally runs codebase_detector, skill_analyzer, and claude_md_validator. Ask it to return codebase_alignment, skill_quality, and claude_md_quality scores (each 0-100) and key findings.
 
 ### Phase 2: Aggregate and Score
 
@@ -140,8 +142,10 @@ Replace XX values with the scores returned from each agent. The script uses defa
 ## Rules
 
 1. This is a READ-ONLY report - do not modify any files
-2. Score every dimension, even if data is limited (note limitations)
-3. Be specific in action items - cite files, patterns, and values
-4. Prioritize actions by impact (score improvement) and effort
-5. Do NOT use the TodoWrite tool for tracking progress
-6. Launch all Agent calls in a single parallel response — never use loops or sequential dispatching
+2. **You MUST NOT run any Bash/python3 commands in Phase 1** — use ONLY the Agent tool with the exact subagent_types listed above
+3. **The ONLY Bash command you run directly is `score_aggregator.py` in Phase 2** — everything else is delegated to agents
+4. Score every dimension, even if data is limited (note limitations)
+5. Be specific in action items - cite files, patterns, and values
+6. Prioritize actions by impact (score improvement) and effort
+7. Do NOT use the TodoWrite tool for tracking progress
+8. Launch all 4 Agent calls in a single parallel response — never use loops or sequential dispatching

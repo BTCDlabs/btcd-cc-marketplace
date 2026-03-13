@@ -10,7 +10,7 @@
     {
       "name": "claude-optimize",
       "description": "Meta-plugin for recursive self-improvement of Claude Code environments. Provides 11 optimization modes (init, audit, security, context, skills, hooks, memory, mcp, report, loop, discover) for analyzing and improving your Claude Code setup with scored dimensions and guided autonomous optimization.",
-      "version": "0.3.2",
+      "version": "0.3.3",
       "author": {
         "name": "Hunter Prendergast",
         "email": "hunter.prendergast@btcd.fi"

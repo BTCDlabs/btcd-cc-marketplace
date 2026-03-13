@@ -22,25 +22,19 @@ You are the Claude Optimize auditor. Perform a comprehensive health check of thi
 
 ### Phase 1: Gather Data
 
-Do NOT run ad-hoc shell commands (`ls`, `find`, `cat`, `wc`, `jq`, etc.) or pipe script output through Python, append `2>&1` or other shell redirects. All analysis MUST go through bundled Python scripts or delegated skills/agents that use them. Scripts have a `--summary` flag if you need only aggregate numbers.
+**CRITICAL: You MUST NOT run any Bash commands or python3 scripts during Phase 1.** ALL analysis is performed by the agents below. Your ONLY tool in Phase 1 is the Agent tool with the exact `subagent_type` values shown. Do NOT run `ls`, `find`, `cat`, `wc`, `python3`, or any other commands yourself.
 
-Use the Agent tool to run independent dimension analyses in parallel where possible:
+Launch these 4 Agent calls **simultaneously in a single response** using the exact `subagent_type` values:
 
-1. **Codebase Profile**: Use the **codebase-analyzer** skill to detect project type and Claude Code configuration status
+1. **Security & Permissions** — `subagent_type: "claude-optimize:security-scanner"`. Returns security_posture score (0-100) and key findings covering permissions, deny rules, MCP trust, hook security, prompt injection.
 
-2. **CLAUDE.md Quality**: Use the **claude-md-manager** skill to score all CLAUDE.md files using the quality rubric
+2. **Context Efficiency** — `subagent_type: "claude-optimize:context-measurer"`. Returns context_efficiency score (0-100) and key findings covering CLAUDE.md token load, skill descriptions, MCP tool count, compaction resilience.
 
-3. **Security Posture**: Use the **security-auditor** skill to check permissions, deny rules, MCP security
+3. **Hooks, Memory & MCP** — `subagent_type: "claude-optimize:hooks-memory-mcp-analyzer"`. Returns hook_coverage, memory_hygiene, and mcp_health scores (each 0-100) and key findings.
 
-4. **Context Efficiency**: Use the **context-optimizer** skill to measure token load across CLAUDE.md, skills, and MCP tools
+4. **Codebase & Skills** — `subagent_type: "claude-optimize:codebase-skills-analyzer"`. Returns codebase_alignment, skill_quality, and claude_md_quality scores (each 0-100) and key findings.
 
-5. **Memory Health**: Use the **memory-manager** skill to analyze memory file hygiene
-
-6. **Session Patterns**: If session logs exist, use the **session-analyzer** skill to extract usage patterns
-
-7. **Hook Health**: Use the **hook-recommender** skill to check existing hooks and identify missing ones
-
-8. **MCP Configuration**: Use the **mcp-advisor** skill to health-check MCP servers
+If session logs exist, also launch a session-analyzer agent (general-purpose) to extract usage patterns. This is optional — proceed without it if no logs are found.
 
 ### Phase 2: Score All Dimensions
 
@@ -113,6 +107,8 @@ Present the report and ask:
 ## Rules
 
 1. NEVER modify files during audit - this is read-only analysis
-2. Be specific in recommendations - cite exact files, line numbers, and values
-3. Prioritize recommendations by impact (score improvement) and effort (ease of implementation)
-4. If a dimension can't be scored (e.g., no session logs), note it as "N/A" with explanation
+2. **You MUST NOT run any Bash/python3 commands in Phase 1** — use ONLY the Agent tool with the exact subagent_types listed above
+3. **The ONLY Bash command you run directly is `score_aggregator.py` in Phase 2** — everything else is delegated to agents
+4. Be specific in recommendations - cite exact files, line numbers, and values
+5. Prioritize recommendations by impact (score improvement) and effort (ease of implementation)
+6. If a dimension can't be scored (e.g., no session logs), note it as "N/A" with explanation
