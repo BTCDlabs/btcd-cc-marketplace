@@ -5,7 +5,9 @@ allowed-tools: Read
 
 # Claude Optimize - Help
 
-Display the following help information to the user:
+First, read the plugin version from `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` and display it as a header. Then display the following help information:
+
+**Claude Optimize v[version from plugin.json]**
 
 ## Available Modes
 
