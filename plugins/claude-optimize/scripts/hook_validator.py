@@ -327,6 +327,16 @@ def main():
 
     if args.settings:
         all_issues.update(validate_hooks_from_config(args.settings))
+        # Also auto-scan the .claude/hooks/ directory adjacent to settings.json
+        settings_dir = os.path.dirname(os.path.abspath(os.path.expanduser(args.settings)))
+        hooks_dir = os.path.join(settings_dir, "hooks")
+        if os.path.isdir(hooks_dir):
+            for root, dirs, files in os.walk(hooks_dir):
+                for fname in files:
+                    if fname.endswith((".sh", ".py", ".bash")):
+                        fpath = os.path.join(root, fname)
+                        if fpath not in all_issues:
+                            all_issues[fpath] = validate_hook_script(fpath)
 
     if args.hooks_dir:
         hooks_dir = os.path.expanduser(args.hooks_dir)
@@ -335,7 +345,8 @@ def main():
                 for fname in files:
                     if fname.endswith((".sh", ".py", ".bash")):
                         fpath = os.path.join(root, fname)
-                        all_issues[fpath] = validate_hook_script(fpath)
+                        if fpath not in all_issues:
+                            all_issues[fpath] = validate_hook_script(fpath)
 
     for script in args.scripts:
         script = os.path.expanduser(script)
