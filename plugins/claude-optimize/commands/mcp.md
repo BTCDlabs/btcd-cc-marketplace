@@ -5,10 +5,7 @@ allowed-tools:
   - Read
   - Grep
   - Glob
-  - Bash(wc:*)
-  - Bash(jq:*)
-  - Bash(which:*)
-  - Bash(command:*)
+  - Bash(python3:*)
   - AskUserQuestion
   - WebSearch
 ---
@@ -25,11 +22,17 @@ Use the **mcp-advisor** skill to perform all analysis:
 
 ### Phase 1: Analysis
 
-1. Read current MCP configuration from `.mcp.json` and global settings
-2. Health check each server (command exists, deps installed, env vars set)
-3. Cross-reference project stack with MCP catalog for recommendations
-4. Assess context impact (tool count, always-loaded vs deferred)
-5. Security review (transport, auth, trust level)
+ALWAYS use the bundled scripts for MCP analysis. Do NOT manually parse .mcp.json, run `which`, `command -v`, `jq`, or any other ad-hoc shell commands.
+
+```bash
+# MCP server health, tool count, and security assessment
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/mcp_health_check.py --json
+
+# Codebase detection for stack cross-referencing
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/codebase_detector.py --json
+```
+
+The mcp_health_check script automatically reads `.mcp.json`, checks command existence, validates env vars, estimates tool counts, and calculates token impact.
 
 References:
 - `${CLAUDE_PLUGIN_ROOT}/skills/mcp-advisor/references/mcp-catalog.md`

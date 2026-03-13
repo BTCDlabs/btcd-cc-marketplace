@@ -7,18 +7,8 @@ allowed-tools:
   - Edit
   - Grep
   - Glob
-  - Bash(git:*)
-  - Bash(which:*)
-  - Bash(command:*)
-  - Bash(wc:*)
-  - Bash(head:*)
-  - Bash(tail:*)
-  - Bash(cat:*)
-  - Bash(jq:*)
-  - Bash(node:*)
-  - Bash(npm:*)
-  - Bash(npx:*)
   - Bash(python3:*)
+  - Bash(git:*)
   - AskUserQuestion
 ---
 

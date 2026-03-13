@@ -7,17 +7,7 @@ allowed-tools:
   - Edit
   - Grep
   - Glob
-  - Bash(wc:*)
-  - Bash(head:*)
-  - Bash(tail:*)
-  - Bash(cat:*)
-  - Bash(jq:*)
   - Bash(python3:*)
-  - Bash(find:*)
-  - Bash(stat:*)
-  - Bash(date:*)
-  - Bash(sort:*)
-  - Bash(uniq:*)
   - Agent
   - AskUserQuestion
 ---
@@ -31,6 +21,8 @@ You are the Claude Optimize auditor. Perform a comprehensive health check of thi
 ## Workflow
 
 ### Phase 1: Gather Data
+
+Do NOT run ad-hoc shell commands (`ls`, `find`, `cat`, `wc`, `jq`, etc.) to gather data. All analysis MUST go through bundled Python scripts or delegated skills/agents that use them.
 
 Use the Agent tool to run independent dimension analyses in parallel where possible:
 
@@ -52,7 +44,13 @@ Use the Agent tool to run independent dimension analyses in parallel where possi
 
 ### Phase 2: Score All Dimensions
 
-Calculate scores for each dimension using the weighted system:
+ALWAYS use the bundled score aggregation script. Do NOT calculate weighted scores manually.
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/score_aggregator.py --scores '{"claude_md_quality": XX, "security_posture": XX, "context_efficiency": XX, "hook_coverage": XX, "skill_quality": XX, "memory_hygiene": XX, "mcp_health": XX, "codebase_alignment": XX}' --json
+```
+
+Reference weights:
 
 | Dimension | Weight | Source |
 |-----------|--------|--------|

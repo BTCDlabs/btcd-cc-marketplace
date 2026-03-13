@@ -9,11 +9,6 @@ tools:
   - Read
   - Grep
   - Glob
-  - Bash(jq:*)
-  - Bash(test:*)
-  - Bash(bash:*)
-  - Bash(cat:*)
-  - Bash(head:*)
   - Bash(python3:*)
 ---
 

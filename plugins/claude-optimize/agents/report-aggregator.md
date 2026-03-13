@@ -9,8 +9,6 @@ tools:
   - Read
   - Grep
   - Glob
-  - Bash(wc:*)
-  - Bash(cat:*)
   - Bash(python3:*)
 ---
 

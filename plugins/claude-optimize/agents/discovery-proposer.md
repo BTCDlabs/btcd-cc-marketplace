@@ -10,9 +10,7 @@ tools:
   - Read
   - Grep
   - Glob
-  - Bash(wc:*)
-  - Bash(cat:*)
-  - Bash(head:*)
+  - Bash(python3:*)
 ---
 
 # Discovery Proposer Agent

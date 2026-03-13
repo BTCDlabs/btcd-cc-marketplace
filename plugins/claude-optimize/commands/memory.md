@@ -7,9 +7,6 @@ allowed-tools:
   - Edit
   - Grep
   - Glob
-  - Bash(wc:*)
-  - Bash(find:*)
-  - Bash(stat:*)
   - Bash(python3:*)
   - AskUserQuestion
 ---

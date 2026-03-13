@@ -5,8 +5,6 @@ allowed-tools:
   - Read
   - Grep
   - Glob
-  - Bash(wc:*)
-  - Bash(head:*)
   - Bash(python3:*)
   - AskUserQuestion
 ---
