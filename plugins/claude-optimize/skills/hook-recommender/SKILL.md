@@ -81,7 +81,9 @@ Reference: `${CLAUDE_PLUGIN_ROOT}/skills/hook-recommender/references/hook-patter
 
 ### Step 4: Session Log Analysis
 
-If session logs are available, look for:
+If session logs are available, use the session-analyzer skill output (provided by the calling command) to identify hook opportunities. Do NOT manually parse JSONL session files or use grep/awk/for loops.
+
+Look for these patterns in the session analyzer output:
 - Repeated manual formatting commands -> suggest auto-format hook
 - Repeated test runs after edits -> suggest auto-test hook
 - Repeated mistakes Claude makes -> suggest prevention hook

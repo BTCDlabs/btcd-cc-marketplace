@@ -37,7 +37,8 @@ For each bash command pattern appearing 5+ times across sessions:
 
 ### Workflow Sequence Gaps
 
-Look for ordered tool-call patterns that repeat across sessions:
+Use the workflow bigrams/trigrams section from the session analyzer output to identify repeating sequences. Do NOT manually parse session JSONL files or use grep/awk/for loops.
+
 - `Read → Edit → Bash(npm test)` appearing 8+ times → test-after-edit workflow skill
 - `Grep → Read → Read → Edit` appearing 10+ times → search-and-fix workflow
 
@@ -61,7 +62,7 @@ Recurring errors in session data suggest missing prevention hooks:
 
 ### File Co-Edit Gaps
 
-Files edited together frequently suggest a specialized workflow:
+Cross-reference file edit patterns from the session analyzer output:
 - If 3+ files are always edited together → candidate for a skill that handles them as a unit
 - If config files and code files are always paired → candidate for a "sync config" skill
 
