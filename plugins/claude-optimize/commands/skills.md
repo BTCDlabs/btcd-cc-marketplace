@@ -19,7 +19,7 @@ You are the Claude Optimize skill analyzer. Assess the skill ecosystem in this C
 
 ### Phase 1: Inventory and Assess Skills
 
-ALWAYS use the bundled script for skill inventory and trigger quality assessment. Do NOT manually glob for skills, count words, or assess trigger quality.
+ALWAYS use the bundled script for skill inventory and trigger quality assessment. Do NOT manually glob for skills, count words, assess trigger quality, or pipe script output through Python for post-processing. Scripts have a `--summary` flag if you need only aggregate numbers.
 
 ```bash
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/skill_analyzer.py --auto-discover --json
@@ -45,7 +45,7 @@ If session logs are available, use the **session-analyzer** skill to identify:
 - Frequently used tool patterns without skill wrappers
 - Commands run manually that could be skills
 
-If memory files exist (check via `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/env_inventory.py --component memory --json`), Read those files and look for:
+If memory files exist (check via `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/env_inventory.py --component memory --json --summary`), Read those files and look for:
 - Documented patterns that should be skills
 - Repeated instructions that indicate missing skills
 

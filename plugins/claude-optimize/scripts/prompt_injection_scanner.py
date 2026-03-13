@@ -259,6 +259,7 @@ def main():
         help="Directories to scan (default: auto-discover from CLAUDE_PLUGIN_ROOT and .claude/)",
     )
     parser.add_argument("--json", action="store_true", help="Output as JSON")
+    parser.add_argument("--summary", action="store_true", help="With --json, output only the summary section")
     parser.add_argument(
         "--auto-discover", action="store_true",
         help="Auto-discover skill and agent directories",
@@ -301,7 +302,10 @@ def main():
     }
 
     if args.json:
-        print(json.dumps(output, indent=2))
+        if args.summary:
+            print(json.dumps(output["summary"], indent=2))
+        else:
+            print(json.dumps(output, indent=2))
     else:
         print(f"\n{'=' * 60}")
         print("PROMPT INJECTION SCAN")

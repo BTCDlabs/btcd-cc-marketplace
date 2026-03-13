@@ -285,6 +285,7 @@ def main():
         help="Paths to .mcp.json files (default: project + user)",
     )
     parser.add_argument("--json", action="store_true", help="Output as JSON")
+    parser.add_argument("--summary", action="store_true", help="With --json, output only summaries")
     parser.add_argument(
         "--server", metavar="NAME",
         help="Check only this specific server"
@@ -297,7 +298,10 @@ def main():
         all_results.append(result)
 
     if args.json:
-        print(json.dumps(all_results, indent=2))
+        if args.summary:
+            print(json.dumps([r.get("summary", {}) for r in all_results], indent=2))
+        else:
+            print(json.dumps(all_results, indent=2))
     else:
         for result in all_results:
             path = result.get("mcp_path", "unknown")

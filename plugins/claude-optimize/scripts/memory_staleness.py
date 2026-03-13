@@ -256,6 +256,7 @@ def main():
     parser.add_argument("memory_files", nargs="*", help="Memory file paths to analyze")
     parser.add_argument("--project-root", default=".", help="Project root for reference checking")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
+    parser.add_argument("--summary", action="store_true", help="With --json, output only the summary section")
     parser.add_argument(
         "--memory-dir", metavar="DIR",
         help="Analyze all .md files in this memory directory"
@@ -307,7 +308,10 @@ def main():
     }
 
     if args.json:
-        print(json.dumps(output, indent=2))
+        if args.summary:
+            print(json.dumps(output["summary"], indent=2))
+        else:
+            print(json.dumps(output, indent=2))
     else:
         print(f"\n{'=' * 60}")
         print("MEMORY STALENESS REPORT")

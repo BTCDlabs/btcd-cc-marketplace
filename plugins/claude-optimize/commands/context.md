@@ -23,7 +23,7 @@ Use the **context-optimizer** skill to perform all analysis:
 
 ### Phase 1: Measure Current Token Load
 
-ALWAYS use the bundled scripts for measurement. Do NOT estimate tokens manually, write ad-hoc counting code, or run shell commands like `wc`, `cat`, `ls`, `find`, or `for` loops. Every measurement MUST go through the Python scripts below.
+ALWAYS use the bundled scripts for measurement. Do NOT estimate tokens manually, write ad-hoc counting code, pipe script output through Python, or run shell commands like `wc`, `cat`, `ls`, `find`, or `for` loops. Every measurement MUST go through the Python scripts below. Use `--summary` when you only need aggregate numbers.
 
 ```bash
 # Measure CLAUDE.md token load
@@ -38,7 +38,7 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/mcp_health_check.py --json
 
 Also check for PreCompact hook presence:
 ```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/permission_auditor.py --json
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/permission_auditor.py --json --summary
 ```
 Review the `precompact_hook` field in the output.
 

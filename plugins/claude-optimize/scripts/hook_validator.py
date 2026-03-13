@@ -312,6 +312,7 @@ def main():
     parser = argparse.ArgumentParser(description="Validate hook scripts for common issues")
     parser.add_argument("scripts", nargs="*", help="Script file paths to validate")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
+    parser.add_argument("--summary", action="store_true", help="With --json, output only the summary")
     parser.add_argument(
         "--settings", metavar="PATH",
         help="Validate all hooks referenced in a settings.json file"
@@ -369,7 +370,10 @@ def main():
             "low": sum(1 for issues in all_issues.values()
                       for i in issues if i.severity == "low"),
         }
-        print(json.dumps(output, indent=2))
+        if args.summary:
+            print(json.dumps(output["_summary"], indent=2))
+        else:
+            print(json.dumps(output, indent=2))
     else:
         for script, issues in all_issues.items():
             status = "PASS" if not issues else "FAIL"

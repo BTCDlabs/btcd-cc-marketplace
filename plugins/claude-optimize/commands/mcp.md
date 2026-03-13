@@ -22,7 +22,7 @@ Use the **mcp-advisor** skill to perform all analysis:
 
 ### Phase 1: Analysis
 
-ALWAYS use the bundled scripts for MCP analysis. Do NOT manually parse .mcp.json, run `which`, `command -v`, `jq`, or any other ad-hoc shell commands.
+ALWAYS use the bundled scripts for MCP analysis. Do NOT manually parse .mcp.json, run `which`, `command -v`, `jq`, pipe script output through Python, or run any other ad-hoc shell commands. Scripts have a `--summary` flag if you need only aggregate numbers.
 
 ```bash
 # MCP server health, tool count, and security assessment

@@ -307,6 +307,7 @@ def main():
     parser.add_argument("claude_md_files", nargs="*", help="CLAUDE.md file paths to validate")
     parser.add_argument("--project-root", default=".", help="Project root directory")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
+    parser.add_argument("--summary", action="store_true", help="With --json, output only score summaries")
     parser.add_argument("--auto-discover", action="store_true", help="Find all CLAUDE.md files")
     args = parser.parse_args()
 
@@ -332,7 +333,22 @@ def main():
         results.append(result)
 
     if args.json:
-        print(json.dumps(results, indent=2))
+        if args.summary:
+            summaries = []
+            for r in results:
+                summaries.append({
+                    "filepath": r.get("filepath"),
+                    "total": r.get("total", 0),
+                    "grade": r.get("grade", "F"),
+                    "word_count": r.get("word_count", 0),
+                    "commands_found": r.get("commands_found", 0),
+                    "valid_commands": r.get("valid_commands", 0),
+                    "paths_found": r.get("paths_found", 0),
+                    "valid_paths": r.get("valid_paths", 0),
+                })
+            print(json.dumps(summaries, indent=2))
+        else:
+            print(json.dumps(results, indent=2))
     else:
         for result in results:
             filepath = result.get("filepath", "unknown")

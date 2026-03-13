@@ -316,6 +316,7 @@ def main():
     )
     parser.add_argument("--project-root", help="Project root directory (default: cwd)")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
+    parser.add_argument("--summary", action="store_true", help="With --json, output only the summary section")
     parser.add_argument(
         "--component",
         choices=["skills", "agents", "hooks", "mcp", "memory", "all"],
@@ -334,7 +335,10 @@ def main():
         inventory = filtered
 
     if args.json:
-        print(json.dumps(inventory, indent=2))
+        if args.summary:
+            print(json.dumps(inventory.get("summary", inventory), indent=2))
+        else:
+            print(json.dumps(inventory, indent=2))
     else:
         for section, items in inventory.items():
             if section == "summary":

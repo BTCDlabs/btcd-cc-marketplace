@@ -297,6 +297,7 @@ def main():
         help="Paths to settings.json files (default: project + user settings)",
     )
     parser.add_argument("--json", action="store_true", help="Output as JSON")
+    parser.add_argument("--summary", action="store_true", help="With --json, output only score summaries")
     args = parser.parse_args()
 
     results = []
@@ -305,7 +306,19 @@ def main():
         results.append(result)
 
     if args.json:
-        print(json.dumps(results, indent=2))
+        if args.summary:
+            summaries = []
+            for r in results:
+                summaries.append({
+                    "settings_path": r.get("settings_path"),
+                    "score": r.get("score", {}).get("total", 0),
+                    "grade": r.get("score", {}).get("grade", "F"),
+                    "env_protection": r.get("env_protection", {}),
+                    "precompact_hook": r.get("precompact_hook", {}),
+                })
+            print(json.dumps(summaries, indent=2))
+        else:
+            print(json.dumps(results, indent=2))
     else:
         for result in results:
             path = result.get("settings_path", "unknown")

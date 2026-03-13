@@ -22,7 +22,7 @@ Use the **security-auditor** skill to perform all security checks:
 
 ### Phase 1: Full Security Analysis
 
-ALWAYS use the bundled scripts for automated checks. Do NOT manually parse settings.json or check deny rules.
+ALWAYS use the bundled scripts for automated checks. Do NOT manually parse settings.json, check deny rules, or pipe script output through Python for post-processing. Scripts have a `--summary` flag if you need only aggregate numbers.
 
 ```bash
 # Permission and deny rule audit

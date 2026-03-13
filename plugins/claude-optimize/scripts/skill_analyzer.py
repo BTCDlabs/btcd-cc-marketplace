@@ -225,6 +225,10 @@ def main():
         "--auto-discover", action="store_true",
         help="Auto-discover skills from standard paths"
     )
+    parser.add_argument(
+        "--summary", action="store_true",
+        help="With --json, output only the summary section"
+    )
     args = parser.parse_args()
 
     paths = list(args.skill_files)
@@ -252,7 +256,8 @@ def main():
     result = analyze_skills(paths)
 
     if args.json:
-        print(json.dumps(result, indent=2))
+        output = result["summary"] if args.summary else result
+        print(json.dumps(output, indent=2))
     else:
         print(f"\n{'=' * 60}")
         print("SKILL ANALYSIS REPORT")
