@@ -37,7 +37,7 @@ Generate proposals of these types based on the evidence:
 **When**: A bash command or workflow repeats 5+ times with no existing skill covering it.
 
 **Generate**:
-- SKILL.md following skill-creator anatomy (see `${CLAUDE_PLUGIN_ROOT}/skills/discover-analyzer/references/proposal-templates.md`)
+- SKILL.md following skill-creator anatomy (see the proposal templates file provided by the caller)
 - Description must be "pushy" — tell Claude exactly when to trigger, including edge cases
 - Include "Do NOT trigger on" clause
 - Keep description under 150 words
@@ -94,7 +94,7 @@ Generate proposals of these types based on the evidence:
 
 ## Security Assessment
 
-**CRITICAL**: Every proposal gets a security assessment before inclusion. Read and apply the constraints in `${CLAUDE_PLUGIN_ROOT}/skills/discover-analyzer/references/security-constraints.md`.
+**CRITICAL**: Every proposal gets a security assessment before inclusion. Read and apply the security constraints file provided by the caller in the prompt.
 
 | Assessment | Meaning | Action |
 |------------|---------|--------|

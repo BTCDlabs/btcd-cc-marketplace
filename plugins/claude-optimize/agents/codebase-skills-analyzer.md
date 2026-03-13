@@ -2,8 +2,7 @@
 name: codebase-skills-analyzer
 description: >
   Use this agent to analyze codebase alignment and skill quality when running
-  /optimize:report. Runs codebase_detector, skill_analyzer, claude_md_validator,
-  and env_inventory scripts. Returns scores for codebase_alignment, skill_quality,
+  /optimize:report. Returns scores for codebase_alignment, skill_quality,
   and claude_md_quality dimensions. Do NOT use for general coding tasks.
 tools:
   - Read
@@ -18,31 +17,20 @@ You analyze codebase alignment, skill quality, and CLAUDE.md quality for the opt
 
 ## Instructions
 
-Run commands EXACTLY as shown — do NOT append `2>&1`, pipe through Python, add shell redirects, run `ls`, `find`, `cat`, `wc`, `for` loops, or modify commands in any way. Do NOT explore directories manually. ALL data comes from the scripts below.
+The caller provides exact script commands in the prompt. Run ONLY those commands, EXACTLY as given.
 
-### 1. Codebase Detection
+**NEVER:**
+- Modify commands in any way (no `2>&1`, no pipes, no redirects)
+- Run `ls`, `find`, `cat`, `wc`, `echo`, `printenv`, `env`, `which`, or any diagnostic/discovery commands
+- Explore directories manually
+- Attempt to debug if a script fails — report the failure and move on
+- Run any command not explicitly provided by the caller
 
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/codebase_detector.py --json
-```
+## Scoring Guide
 
-Score codebase_alignment (0-100) based on: whether Claude Code configuration exists, project type detected, CLAUDE.md presence.
-
-### 2. Skill Quality
-
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/skill_analyzer.py --auto-discover --json
-```
-
-Score skill_quality (0-100) based on: trigger quality ratings (excellent/good/fair/poor distribution), overlap count, description word count compliance.
-
-### 3. CLAUDE.md Quality
-
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/claude_md_validator.py --auto-discover --json
-```
-
-Score claude_md_quality (0-100) using the total score from the script output directly.
+- **codebase_alignment** (0-100): Based on whether Claude Code configuration exists, project type detected, CLAUDE.md presence
+- **skill_quality** (0-100): Based on trigger quality ratings (excellent/good/fair/poor distribution), overlap count, description word count compliance
+- **claude_md_quality** (0-100): Use the total score from the CLAUDE.md validator output directly
 
 ## Output Format
 

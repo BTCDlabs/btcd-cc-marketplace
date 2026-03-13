@@ -26,13 +26,40 @@ You are the Claude Optimize auditor. Perform a comprehensive health check of thi
 
 Launch these 4 Agent calls **simultaneously in a single response** using the exact `subagent_type` values:
 
-1. **Security & Permissions** — `subagent_type: "claude-optimize:security-scanner"`. Returns security_posture score (0-100) and key findings covering permissions, deny rules, MCP trust, hook security, prompt injection.
+1. **Security & Permissions** — `subagent_type: "claude-optimize:security-scanner"`. In your prompt to the agent, include these EXACT commands for it to run (copy them verbatim — the agent cannot discover paths on its own):
+   ```
+   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/permission_auditor.py --json --summary
+   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/mcp_health_check.py --json --summary
+   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hook_validator.py --settings .claude/settings.json --json --summary
+   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/prompt_injection_scanner.py --auto-discover --json --summary
+   ```
+   Ask it to return a security_posture score (0-100) and key findings covering permissions, deny rules, MCP trust, hook security, prompt injection.
 
-2. **Context Efficiency** — `subagent_type: "claude-optimize:context-measurer"`. Returns context_efficiency score (0-100) and key findings covering CLAUDE.md token load, skill descriptions, MCP tool count, compaction resilience.
+2. **Context Efficiency** — `subagent_type: "claude-optimize:context-measurer"`. In your prompt to the agent, include these EXACT commands for it to run (copy them verbatim):
+   ```
+   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/token_counter.py --claude-md --json --summary
+   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/skill_analyzer.py --auto-discover --json --summary
+   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/mcp_health_check.py --json --summary
+   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/permission_auditor.py --json --summary
+   ```
+   Ask it to return a context_efficiency score (0-100) and key findings covering CLAUDE.md token load, skill descriptions, MCP tool count, compaction resilience.
 
-3. **Hooks, Memory & MCP** — `subagent_type: "claude-optimize:hooks-memory-mcp-analyzer"`. Returns hook_coverage, memory_hygiene, and mcp_health scores (each 0-100) and key findings.
+3. **Hooks, Memory & MCP** — `subagent_type: "claude-optimize:hooks-memory-mcp-analyzer"`. In your prompt to the agent, include these EXACT commands for it to run (copy them verbatim):
+   ```
+   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/env_inventory.py --json --summary
+   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hook_validator.py --settings .claude/settings.json --json --summary
+   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/memory_staleness.py --json --summary
+   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/mcp_health_check.py --json --summary
+   ```
+   Ask it to return hook_coverage, memory_hygiene, and mcp_health scores (each 0-100) and key findings.
 
-4. **Codebase & Skills** — `subagent_type: "claude-optimize:codebase-skills-analyzer"`. Returns codebase_alignment, skill_quality, and claude_md_quality scores (each 0-100) and key findings.
+4. **Codebase & Skills** — `subagent_type: "claude-optimize:codebase-skills-analyzer"`. In your prompt to the agent, include these EXACT commands for it to run (copy them verbatim):
+   ```
+   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/codebase_detector.py --json
+   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/skill_analyzer.py --auto-discover --json --summary
+   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/claude_md_validator.py --json --summary
+   ```
+   Ask it to return codebase_alignment, skill_quality, and claude_md_quality scores (each 0-100) and key findings.
 
 If session logs exist, also launch a session-analyzer agent (general-purpose) to extract usage patterns. This is optional — proceed without it if no logs are found.
 

@@ -36,41 +36,40 @@ Gather data about how the environment is actually being used. Launch these 3 Age
 
 ### Agent 1: Session Reflection
 
-Run the bundled session analysis script. Do NOT write your own script — the bundled one extracts all required metrics:
+Launch a general-purpose agent. In your prompt, include this EXACT command for it to run (copy verbatim — the agent cannot discover paths on its own):
 
 ```
 python3 ${CLAUDE_PLUGIN_ROOT}/skills/session-analyzer/scripts/analyze_sessions.py --max-sessions 30
 ```
 
-This outputs tool usage, bash commands, file edits/reads, glob/grep patterns, MCP calls, ToolSearch queries, errors, branches, workflow bigrams/trigrams, and session distribution. Return the full script output. If fewer than 15 sessions exist, note this limitation.
+Tell the agent: "Run this exact command and return the full output. Do NOT modify the command, append `2>&1`, or pipe through Python."
+
+This outputs tool usage, bash commands, file edits/reads, glob/grep patterns, MCP calls, ToolSearch queries, errors, branches, workflow bigrams/trigrams, and session distribution. If fewer than 15 sessions exist, note this limitation.
 
 ### Agent 2: Environment Inventory
 
-ALWAYS use the bundled script for environment inventory. Do NOT manually glob for skills, agents, hooks, or MCP servers, or pipe script output through Python, append `2>&1` or other shell redirects. Scripts have a `--summary` flag if you need only aggregate numbers.
+Launch a general-purpose agent. In your prompt, include this EXACT command for it to run (copy verbatim):
 
-```bash
+```
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/env_inventory.py --json
 ```
 
-The script catalogs all skills (with description word counts), agents, hooks, MCP servers, and memory files from both project and user directories. It returns a complete structured inventory with source annotations.
+Tell the agent: "Run this exact command and return the full output. Do NOT modify the command, append `2>&1`, or pipe through Python."
 
-Return the full script output.
+The script catalogs all skills (with description word counts), agents, hooks, MCP servers, and memory files from both project and user directories.
 
 ### Agent 3: Codebase Profile
 
-ALWAYS use the bundled scripts. Do NOT manually check file patterns or parse settings.
+Launch a general-purpose agent. In your prompt, include these EXACT commands for it to run (copy verbatim):
 
-```bash
-# Detect project technology stack
+```
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/codebase_detector.py --json
-
-# Check security posture (includes deny rules and plugin detection)
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/permission_auditor.py --json
 ```
 
-The codebase_detector output includes: languages, frameworks, package managers, CI/CD, build tools, external services, and installed plugins (including hookify). The permission_auditor output includes deny rule analysis.
+Tell the agent: "Run these exact commands and return the full output. Do NOT modify the commands, append `2>&1`, or pipe through Python."
 
-Return the combined output.
+The codebase_detector output includes: languages, frameworks, package managers, CI/CD, build tools, external services, and installed plugins (including hookify). The permission_auditor output includes deny rule analysis.
 
 ## Phase 2: Analyze
 
@@ -84,7 +83,12 @@ The agent should be given:
 
 In the agent prompt, include these instructions:
 
-> Read and follow the discover-analyzer skill at `${CLAUDE_PLUGIN_ROOT}/skills/discover-analyzer/SKILL.md` and its references at `${CLAUDE_PLUGIN_ROOT}/skills/discover-analyzer/references/bloat-heuristics.md`. Perform gap detection, bloat detection (if 15+ sessions), and calculate the tooling coverage score. Return the structured analysis report format specified in the skill. Be thorough — identify ALL gaps including stack coverage gaps against the MCP catalog at `${CLAUDE_PLUGIN_ROOT}/skills/mcp-advisor/references/mcp-catalog.md`.
+> Read and follow the discover-analyzer skill at `SKILL_PATH` and its references at `BLOAT_PATH`. Perform gap detection, bloat detection (if 15+ sessions), and calculate the tooling coverage score. Return the structured analysis report format specified in the skill. Be thorough — identify ALL gaps including stack coverage gaps against the MCP catalog at `MCP_CATALOG_PATH`.
+
+Replace the placeholders above with these resolved paths before sending to the agent:
+- `SKILL_PATH` = `${CLAUDE_PLUGIN_ROOT}/skills/discover-analyzer/SKILL.md`
+- `BLOAT_PATH` = `${CLAUDE_PLUGIN_ROOT}/skills/discover-analyzer/references/bloat-heuristics.md`
+- `MCP_CATALOG_PATH` = `${CLAUDE_PLUGIN_ROOT}/skills/mcp-advisor/references/mcp-catalog.md`
 
 Pass all three data sets to the agent as part of the prompt. Wait for the agent to return before proceeding.
 
@@ -95,7 +99,11 @@ Pass all three data sets to the agent as part of the prompt. Wait for the agent 
 
 ### Step 1: Check the MCP catalog
 
-Read `${CLAUDE_PLUGIN_ROOT}/skills/mcp-advisor/references/mcp-catalog.md` and compare against installed servers from the inventory. Note any matches for the detected stack that aren't installed.
+Read the MCP catalog and compare against installed servers from the inventory. Note any matches for the detected stack that aren't installed. The MCP catalog is at:
+
+```
+${CLAUDE_PLUGIN_ROOT}/skills/mcp-advisor/references/mcp-catalog.md
+```
 
 ### Step 2: Run WebSearch queries
 
@@ -116,7 +124,11 @@ For each discovered MCP server:
 - Check if it requires API keys or credentials (flag as WARN ⚠, not BLOCK)
 - Cross-reference against what's already installed (skip duplicates)
 
-Read `${CLAUDE_PLUGIN_ROOT}/skills/discover-analyzer/references/security-constraints.md` MCP section for trust verification rules.
+Read the security constraints file for trust verification rules:
+
+```
+${CLAUDE_PLUGIN_ROOT}/skills/discover-analyzer/references/security-constraints.md
+```
 
 ### Step 4: Label findings
 
@@ -139,7 +151,12 @@ Launch an Agent with `subagent_type` matching the **discovery-proposer** agent. 
 
 In the agent prompt, also include:
 
-> Read your full instructions at `${CLAUDE_PLUGIN_ROOT}/agents/discovery-proposer.md`. Read proposal templates at `${CLAUDE_PLUGIN_ROOT}/skills/discover-analyzer/references/proposal-templates.md` and security constraints at `${CLAUDE_PLUGIN_ROOT}/skills/discover-analyzer/references/security-constraints.md`.
+> Read your full instructions at `PROPOSER_PATH`. Read proposal templates at `TEMPLATES_PATH` and security constraints at `CONSTRAINTS_PATH`.
+
+Replace the placeholders above with these resolved paths before sending to the agent:
+- `PROPOSER_PATH` = `${CLAUDE_PLUGIN_ROOT}/agents/discovery-proposer.md`
+- `TEMPLATES_PATH` = `${CLAUDE_PLUGIN_ROOT}/skills/discover-analyzer/references/proposal-templates.md`
+- `CONSTRAINTS_PATH` = `${CLAUDE_PLUGIN_ROOT}/skills/discover-analyzer/references/security-constraints.md`
 >
 > IMPORTANT:
 > - Every proposal MUST include a **complete implementation preview** — the full file content that would be created (complete SKILL.md, complete hook file, complete .mcp.json snippet with install command). Proposals without previews are incomplete.
