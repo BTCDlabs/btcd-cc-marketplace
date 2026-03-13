@@ -36,7 +36,7 @@ The setup script creates a state file in `/tmp/claude-optimize/` and activates t
 
 ### On Every Iteration
 
-1. Read the state file to understand current state and iteration number
+1. Use the **Read** tool (NOT `cat` or any Bash command) to read the state file at `/tmp/claude-optimize/loop-default.md` to understand current state and iteration number
 2. Follow the phase that matches the current state:
 
 ### Phase 1: Report (iteration 1, or when re-scoring is needed)
@@ -94,7 +94,8 @@ Tell the user to run `/optimize:loop` again to resume.
 
 ## Rules
 
-1. **NEVER execute actions without explicit user approval** — presenting a plan is not approval
+1. **Use the Read tool to read files** — NEVER use `cat`, `head`, `tail`, or Bash to read files. The Read tool is always available.
+2. **NEVER execute actions without explicit user approval** — presenting a plan is not approval
 2. **Use `AskUserQuestion` for ALL user interaction** — do not pause the loop just to ask a question
 3. Only work on actions the user explicitly approved — skip everything else
 4. After completing all approved actions, re-score and check in with the user before exiting
