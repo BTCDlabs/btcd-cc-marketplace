@@ -46,7 +46,7 @@ This outputs tool usage, bash commands, file edits/reads, glob/grep patterns, MC
 
 ### Agent 2: Environment Inventory
 
-ALWAYS use the bundled script for environment inventory. Do NOT manually glob for skills, agents, hooks, or MCP servers, or pipe script output through Python for post-processing. Scripts have a `--summary` flag if you need only aggregate numbers.
+ALWAYS use the bundled script for environment inventory. Do NOT manually glob for skills, agents, hooks, or MCP servers, or pipe script output through Python, append `2>&1` or other shell redirects. Scripts have a `--summary` flag if you need only aggregate numbers.
 
 ```bash
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/env_inventory.py --json

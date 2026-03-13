@@ -20,7 +20,7 @@ You are a specialized context efficiency analyzer for Claude Code environments. 
 
 ### 1. CLAUDE.md Files
 
-ALWAYS use the bundled script. Do NOT estimate tokens manually, run `wc`, `cat`, `ls`, `find`, `for` loops, or any other ad-hoc shell commands.
+ALWAYS use the bundled script. Run commands EXACTLY as shown — do NOT append `2>&1`, pipe through Python, add shell redirects, or modify commands in any way. Do NOT estimate tokens manually, run `wc`, `cat`, `ls`, `find`, `for` loops, or any other ad-hoc shell commands.
 
 ```bash
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/token_counter.py --claude-md --json --summary

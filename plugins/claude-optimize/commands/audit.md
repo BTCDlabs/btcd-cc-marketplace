@@ -22,7 +22,7 @@ You are the Claude Optimize auditor. Perform a comprehensive health check of thi
 
 ### Phase 1: Gather Data
 
-Do NOT run ad-hoc shell commands (`ls`, `find`, `cat`, `wc`, `jq`, etc.) or pipe script output through Python for post-processing. All analysis MUST go through bundled Python scripts or delegated skills/agents that use them. Scripts have a `--summary` flag if you need only aggregate numbers.
+Do NOT run ad-hoc shell commands (`ls`, `find`, `cat`, `wc`, `jq`, etc.) or pipe script output through Python, append `2>&1` or other shell redirects. All analysis MUST go through bundled Python scripts or delegated skills/agents that use them. Scripts have a `--summary` flag if you need only aggregate numbers.
 
 Use the Agent tool to run independent dimension analyses in parallel where possible:
 

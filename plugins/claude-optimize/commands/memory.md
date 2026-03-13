@@ -23,7 +23,7 @@ Use the **memory-manager** skill to perform all analysis:
 
 ### Phase 1: Analysis
 
-ALWAYS use the bundled scripts for memory analysis. Do NOT manually count lines, estimate tokens, grep for staleness, or pipe script output through Python for post-processing. Scripts have a `--summary` flag if you need only aggregate numbers.
+ALWAYS use the bundled scripts for memory analysis. Do NOT manually count lines, estimate tokens, grep for staleness, or pipe script output through Python, append `2>&1` or other shell redirects. Scripts have a `--summary` flag if you need only aggregate numbers.
 
 ```bash
 # Inventory memory files with token counts

@@ -56,7 +56,7 @@ Generate a unified report with:
 5. Quick wins (easy + high impact)
 6. Deep dive recommendations (which /optimize: commands to run)
 
-ALWAYS use the bundled script for score aggregation. Do NOT calculate weighted scores manually.
+ALWAYS use the bundled script for score aggregation. Run commands EXACTLY as shown — do NOT append `2>&1`, pipe through Python, add shell redirects, or modify commands in any way. Do NOT calculate weighted scores manually.
 
 ```bash
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/score_aggregator.py --scores '{"claude_md_quality": XX, "security_posture": XX, "context_efficiency": XX, "hook_coverage": XX, "skill_quality": XX, "memory_hygiene": XX, "mcp_health": XX, "codebase_alignment": XX}' --json

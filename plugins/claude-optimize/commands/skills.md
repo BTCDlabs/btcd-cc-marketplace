@@ -19,7 +19,7 @@ You are the Claude Optimize skill analyzer. Assess the skill ecosystem in this C
 
 ### Phase 1: Inventory and Assess Skills
 
-ALWAYS use the bundled script for skill inventory and trigger quality assessment. Do NOT manually glob for skills, count words, assess trigger quality, or pipe script output through Python for post-processing. Scripts have a `--summary` flag if you need only aggregate numbers.
+ALWAYS use the bundled script for skill inventory and trigger quality assessment. Do NOT manually glob for skills, count words, assess trigger quality, or pipe script output through Python, append `2>&1` or other shell redirects. Scripts have a `--summary` flag if you need only aggregate numbers.
 
 ```bash
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/skill_analyzer.py --auto-discover --json
