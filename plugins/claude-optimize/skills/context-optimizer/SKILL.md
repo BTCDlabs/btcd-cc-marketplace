@@ -22,7 +22,7 @@ Claude Code reserves a buffer of ~33K-45K tokens for system instructions, CLAUDE
 
 ### Step 1: Measure CLAUDE.md Token Load
 
-ALWAYS use the bundled script for token measurement — it provides deterministic, consistent results across all runs. Do NOT estimate tokens manually or generate ad-hoc counting code.
+ALWAYS use the bundled script for token measurement — it provides deterministic, consistent results across all runs. Do NOT estimate tokens manually, generate ad-hoc counting code, or run shell commands like `wc`, `cat`, `ls`, `find`, or `for` loops.
 
 ```bash
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/token_counter.py --claude-md --json

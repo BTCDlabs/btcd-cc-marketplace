@@ -23,7 +23,7 @@ Use the **context-optimizer** skill to perform all analysis:
 
 ### Phase 1: Measure Current Token Load
 
-ALWAYS use the bundled scripts for measurement. Do NOT estimate tokens manually or write ad-hoc counting code.
+ALWAYS use the bundled scripts for measurement. Do NOT estimate tokens manually, write ad-hoc counting code, or run shell commands like `wc`, `cat`, `ls`, `find`, or `for` loops. Every measurement MUST go through the Python scripts below.
 
 ```bash
 # Measure CLAUDE.md token load

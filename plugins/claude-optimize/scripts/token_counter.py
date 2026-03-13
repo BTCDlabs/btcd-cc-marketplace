@@ -109,23 +109,53 @@ def count_description(description_text):
     }
 
 
-def analyze_claude_md_files(search_dirs):
-    """Find and analyze all CLAUDE.md files in given directories.
+def analyze_claude_md_files(project_root="."):
+    """Find and analyze all CLAUDE.md files in the project and user config.
+
+    Searches:
+    - Project root and all subdirectories for CLAUDE.md
+    - ~/.claude/ for any .md files (user-level config)
+
+    Does NOT walk the entire home directory.
 
     Returns list of analysis results.
     """
+    import glob as globmod
+
+    project_root = os.path.abspath(os.path.expanduser(project_root))
+    found = set()
     results = []
-    for search_dir in search_dirs:
-        search_dir = os.path.expanduser(search_dir)
-        if not os.path.isdir(search_dir):
-            continue
-        for root, dirs, files in os.walk(search_dir):
-            for fname in files:
-                if fname == "CLAUDE.md":
-                    filepath = os.path.join(root, fname)
+
+    # Project-level: recursively find all CLAUDE.md files
+    for filepath in globmod.glob(os.path.join(project_root, "**", "CLAUDE.md"), recursive=True):
+        filepath = os.path.abspath(filepath)
+        if filepath not in found:
+            found.add(filepath)
+            metrics = count_file(filepath, content_type="prose")
+            if metrics:
+                results.append(metrics)
+
+    # Also check for .claude.local.md variants in project root
+    for variant in ["CLAUDE.md", ".claude.local.md", "CLAUDE.local.md"]:
+        filepath = os.path.abspath(os.path.join(project_root, variant))
+        if filepath not in found and os.path.isfile(filepath):
+            found.add(filepath)
+            metrics = count_file(filepath, content_type="prose")
+            if metrics:
+                results.append(metrics)
+
+    # User-level: check ~/.claude/ directory (not recursive walk of ~)
+    user_claude_dir = os.path.expanduser("~/.claude")
+    if os.path.isdir(user_claude_dir):
+        for fname in os.listdir(user_claude_dir):
+            if fname.endswith(".md"):
+                filepath = os.path.join(user_claude_dir, fname)
+                if filepath not in found and os.path.isfile(filepath):
+                    found.add(filepath)
                     metrics = count_file(filepath, content_type="prose")
                     if metrics:
                         results.append(metrics)
+
     return results
 
 
@@ -167,8 +197,7 @@ def main():
         return
 
     if args.claude_md:
-        search_dirs = [".", os.path.expanduser("~")]
-        results = analyze_claude_md_files(search_dirs)
+        results = analyze_claude_md_files(".")
     else:
         for path in args.paths:
             path = os.path.expanduser(path)
