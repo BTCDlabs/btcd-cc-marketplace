@@ -13,19 +13,29 @@ Analyzes Claude Code environment security posture and recommends hardening measu
 
 ## Analysis Workflow
 
-### Step 1: Read Current Security Configuration
+### Step 1: Run All Security Scans
 
-Read these files (all in parallel):
-- `.claude/settings.json` - permissions (allow/deny rules)
-- `.claude/settings.local.json` - personal overrides
-- `.mcp.json` - MCP server configuration
-- `CLAUDE.md` - check for security-related instructions
-- `.claude/skills/*/SKILL.md` - scan skill allowed-tools
-- Glob `hooks/` directories for hook scripts
+ALWAYS use the bundled scripts for all security analysis. Do NOT manually read `.claude/settings.json`, parse `.mcp.json`, Glob for hook scripts, scan SKILL.md files, or run any ad-hoc shell commands.
+
+```bash
+# Permission and deny rule audit (also checks .env protection and precompact hook)
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/permission_auditor.py --json
+
+# MCP server security and health
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/mcp_health_check.py --json
+
+# Hook script security validation
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hook_validator.py --settings .claude/settings.json --json
+
+# Prompt injection scan across all skills and agents
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/prompt_injection_scanner.py --auto-discover --json
+```
+
+These four scripts cover all security dimensions. Use their JSON output for scoring and reporting — do NOT supplement with manual file reads or shell commands.
 
 ### Step 2: Permission Analysis
 
-ALWAYS use the bundled script for permission auditing. Do NOT manually parse settings.json or check deny/allow rules.
+Interpret the permission_auditor output. Do NOT manually parse settings.json or check deny/allow rules.
 
 ```bash
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/permission_auditor.py --json

@@ -53,7 +53,7 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/claude_md_validator.py --auto-discover --j
 
 The skill_analyzer output (Phase 1) already flags descriptions over 150 words and rates trigger quality. The mcp_health_check output (Phase 1) already flags excessive tool counts and shows which servers could benefit from deferred loading.
 
-Additionally, Read each CLAUDE.md file and identify:
+The token_counter output (Phase 1) lists all discovered CLAUDE.md files. Read each one (using the paths from that output — do NOT discover files yourself) and identify:
 1. Redundant instructions (duplicates default Claude behavior)
 2. Verbose content (paragraphs that could be bullet points)
 3. Duplicate content (same info in multiple files)

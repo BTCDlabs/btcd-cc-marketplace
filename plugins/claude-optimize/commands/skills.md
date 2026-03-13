@@ -45,7 +45,7 @@ If session logs are available, use the **session-analyzer** skill to identify:
 - Frequently used tool patterns without skill wrappers
 - Commands run manually that could be skills
 
-Check memory files for:
+If memory files exist (check via `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/env_inventory.py --component memory --json`), Read those files and look for:
 - Documented patterns that should be skills
 - Repeated instructions that indicate missing skills
 

@@ -41,22 +41,17 @@ The script automatically applies word-based token estimation (words × 1.3) and 
 
 ### Step 2: Analyze Instruction Density
 
-For each CLAUDE.md file, evaluate:
+Use the CLAUDE.md validator to detect stale references and cross-reference issues:
 
-#### Redundancy Detection
-- Instructions that repeat the same thing in different words
-- Instructions that duplicate Claude's default behavior (e.g., "write clean code")
-- Instructions copied from templates that don't apply to this project
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/claude_md_validator.py --auto-discover --json
+```
 
-#### Verbosity Detection
-- Instructions that use 3 sentences where 1 would suffice
-- Excessive examples where 1 example demonstrates the pattern
-- Long explanations for simple conventions
+The script detects stale file paths and invalid commands automatically. For the remaining qualitative analysis, Read each CLAUDE.md file (the token_counter output from Step 1 lists all discovered files) and look for:
 
-#### Staleness Detection
-- References to files/patterns that no longer exist
-- Instructions for tools/frameworks no longer in use
-- Outdated version numbers or API references
+- **Redundancy**: Instructions that repeat the same thing or duplicate Claude's default behavior
+- **Verbosity**: Paragraphs where bullet points would suffice, excessive examples
+- **Staleness**: The validator catches file/command staleness; also look for outdated API references or removed framework mentions
 
 ### Step 3: Analyze Skill Description Sizes
 
@@ -88,12 +83,7 @@ The script automatically:
 
 ### Step 5: Check Compaction Resilience
 
-Look for PreCompact hook:
-- Does a PreCompact hook exist?
-- Does it preserve critical context during compaction?
-- Does it save important state that would otherwise be lost?
-
-If no PreCompact hook exists, recommend creating one that preserves:
+The permission_auditor output (Step 1 `--json` output) includes a `precompact_hook` field. Check `has_precompact_hook` — if false, recommend creating one that preserves:
 - Current task/goal
 - Key file paths being worked on
 - Important decisions made

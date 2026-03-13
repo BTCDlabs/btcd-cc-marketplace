@@ -23,7 +23,7 @@ Use the **hook-recommender** skill to perform all analysis:
 
 ### Phase 1: Analysis
 
-ALWAYS use the bundled scripts for hook analysis. Do NOT manually check hook health or validate scripts.
+ALWAYS use the bundled scripts for hook analysis. Do NOT manually read `.claude/settings.json`, check hook health, validate scripts, run `bash -n`, use `for` loops, or run any ad-hoc shell commands.
 
 ```bash
 # Inventory hooks and validate scripts

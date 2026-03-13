@@ -13,28 +13,30 @@ Assesses and improves CLAUDE.md files using a structured quality rubric. Powers 
 
 ## Assessment Workflow
 
-### Step 1: Discover All CLAUDE.md Files
+### Step 1: Discover, Score, and Cross-Reference
 
-Use Glob to find all variants:
+ALWAYS use the bundled scripts. Do NOT use Glob to discover CLAUDE.md files, manually count tokens, parse package.json, or run any ad-hoc shell commands.
 
-| Type | Location | Purpose |
-|------|----------|---------|
-| Project root | `./CLAUDE.md` | Primary project context (shared with team) |
-| Local overrides | `./.claude.local.md` | Personal settings (gitignored) |
-| Global defaults | `~/.claude/CLAUDE.md` | User-wide defaults across projects |
-| Package-specific | `./packages/*/CLAUDE.md` | Module-level context in monorepos |
-| Subdirectory | Any nested `CLAUDE.md` | Feature/domain-specific context |
+```bash
+# Discover all CLAUDE.md files and measure token load
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/token_counter.py --claude-md --json --summary
 
-Also check: `.claude.md`, `**/.claude.md`
+# Score quality, validate commands, and check file path references
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/claude_md_validator.py --auto-discover --json
+```
 
-**Note:** Claude auto-discovers CLAUDE.md files in parent directories.
+The token_counter recursively finds all CLAUDE.md variants (project root, subdirectories, `.claude.local.md`, `~/.claude/`) and reports token counts with bands.
 
-### Step 2: Score Each File
+The validator automatically:
+- Extracts commands from code blocks and inline backticks
+- Validates commands against `package.json` scripts and `Makefile` targets
+- Checks if all referenced file paths exist
+- Scores each CLAUDE.md on the 6-dimension rubric
+- Reports invalid commands and missing paths
 
-Apply the quality rubric from:
-`${CLAUDE_PLUGIN_ROOT}/skills/claude-md-manager/references/quality-criteria.md`
+### Step 2: Interpret Scores
 
-Score on 6 dimensions (total 100):
+The validator scores on 6 dimensions (total 100):
 
 | Dimension | Points | Key Question |
 |-----------|--------|--------------|
@@ -47,22 +49,9 @@ Score on 6 dimensions (total 100):
 
 **Grade Scale**: A (90-100), B (70-89), C (50-69), D (30-49), F (0-29)
 
-### Step 3: Cross-Reference with Codebase
+Quality rubric reference: `${CLAUDE_PLUGIN_ROOT}/skills/claude-md-manager/references/quality-criteria.md`
 
-ALWAYS use the bundled script for CLAUDE.md validation. Do NOT manually parse package.json, check file paths, or verify commands.
-
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/claude_md_validator.py --auto-discover --json
-```
-
-The script automatically:
-- Extracts commands from code blocks and inline backticks
-- Validates commands against `package.json` scripts and `Makefile` targets
-- Checks if all referenced file paths exist
-- Scores each CLAUDE.md on the 6-dimension rubric (commands, architecture, patterns, conciseness, currency, actionability)
-- Reports invalid commands and missing paths
-
-### Step 4: Identify Improvements
+### Step 3: Identify Improvements
 
 For each issue found, categorize:
 - **Missing content**: Key section absent (use templates reference)
@@ -71,7 +60,7 @@ For each issue found, categorize:
 - **Redundant content**: Duplicates Claude's default behavior
 - **Inaccurate content**: Contradicts actual codebase state
 
-### Step 5: Generate Assessment
+### Step 4: Generate Assessment
 
 ```markdown
 ## CLAUDE.md Quality Assessment

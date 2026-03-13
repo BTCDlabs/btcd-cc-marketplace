@@ -13,28 +13,21 @@ Analyzes MCP server configuration and recommends improvements based on project s
 
 ## Analysis Workflow
 
-### Step 1: Read Current MCP Configuration
+### Step 1: Read and Health-Check MCP Configuration
 
-Read `.mcp.json` at project root and `~/.claude/settings.json` for global MCP config.
-
-For each server, record:
-- Name
-- Command and args
-- Environment variables
-- Transport type (stdio, HTTP, SSE)
-
-### Step 2: Health Check
-
-ALWAYS use the bundled script for MCP health checks. Do NOT manually run `which`, `command -v`, or check env vars.
+ALWAYS use the bundled script. Do NOT manually read `.mcp.json`, parse `~/.claude/settings.json`, run `which`, `command -v`, `jq`, or any ad-hoc shell commands.
 
 ```bash
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/mcp_health_check.py --json
 ```
 
-The script checks each configured server for:
-1. **Existence check**: Command exists on system (via `which`)
-2. **Dependency check**: Required packages are reachable
-3. **Configuration check**: Required env vars are set
+The script automatically:
+- Reads `.mcp.json` (project) and `~/.claude/settings.json` (global)
+- For each server, extracts: name, command, args, env vars
+- Checks command existence on system (via `which`)
+- Validates required environment variables are set
+- Estimates tool count from built-in catalog
+- Calculates token impact (always-loaded vs deferred)
 
 ### Step 3: Stack-Based Recommendations
 

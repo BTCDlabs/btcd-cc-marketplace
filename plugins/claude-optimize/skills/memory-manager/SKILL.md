@@ -13,28 +13,19 @@ Analyzes Claude Code memory files for hygiene, staleness, duplicates, and migrat
 
 ## Analysis Workflow
 
-### Step 1: Discover Memory Files
+### Step 1: Discover and Analyze Memory Files
 
-Find the project's memory directory:
-```
-~/.claude/projects/
-```
+ALWAYS use the bundled scripts. Do NOT use Glob to find memory directories, manually read `~/.claude/projects/`, count lines, estimate tokens, or run any ad-hoc shell commands.
 
-Use Glob to find all directories matching the current project, then read all `.md` files in the `memory/` subdirectory. Also check for `MEMORY.md` which is always loaded into context.
-
-### Step 2: Parse and Analyze Memory Files
-
-ALWAYS use the bundled scripts for memory file analysis. Do NOT manually count lines, estimate tokens, or grep for staleness.
-
-**For parsing and token counting:**
 ```bash
+# Discover and inventory all memory files with token counts
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/env_inventory.py --component memory --json
-```
 
-**For staleness detection and duplicate finding:**
-```bash
+# Detect stale entries and find duplicates
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/memory_staleness.py --check-duplicates --json
 ```
+
+The env_inventory automatically discovers the project's memory directory under `~/.claude/projects/`, finds all `.md` files including `MEMORY.md`, and reports token counts.
 
 The staleness script automatically:
 - Extracts file paths, function names, and package names from each entry

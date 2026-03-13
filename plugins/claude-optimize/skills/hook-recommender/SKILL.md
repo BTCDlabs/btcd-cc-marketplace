@@ -13,43 +13,29 @@ Analyzes Claude Code hook configuration for health, coverage gaps, and improveme
 
 ## Analysis Workflow
 
-### Step 1: Inventory Existing Hooks
+### Step 1: Inventory and Validate Hooks
 
-Read hook configuration from:
-- `.claude/settings.json` (project hooks)
-- `.claude/settings.local.json` (personal hooks)
-- Any plugin hooks (from installed plugins)
+ALWAYS use the bundled scripts. Do NOT manually read `.claude/settings.json`, parse hook JSON, check shebangs/permissions, run `bash -n`, or use any ad-hoc shell commands like `for` loops.
 
-For each hook, record:
-- Event type (PreToolUse, PostToolUse, Stop, SessionStart, etc.)
-- Matcher pattern
-- Command/script path
-- Timeout setting
+```bash
+# Inventory all hooks (project, personal, plugin)
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/env_inventory.py --component hooks --json
 
-### Step 2: Hook Health Assessment
+# Validate all hook scripts for health issues
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hook_validator.py --settings .claude/settings.json --json
+```
 
-For each hook:
+The env_inventory discovers hooks from `.claude/settings.json`, `.claude/settings.local.json`, and installed plugins. For each hook it returns: event type, matcher, command/script path, and timeout.
 
-#### Timeout Risk
+The hook_validator checks all hook scripts for: missing shebang, missing `set -euo pipefail`, unquoted variables (injection risk), missing executable permissions, references to non-existent files, syntax errors (via `bash -n`), and stdin handling.
+
+### Step 2: Interpret Validation Results
+
+Review the validator output for timeout risks:
 - No timeout set: Warning (defaults may be too long)
 - Timeout > 30s: Warning (blocks Claude for too long)
 - Timeout > 5s: Info (consider if this is necessary)
 - Timeout <= 5s: OK
-
-#### Error Detection and Functionality Test
-
-ALWAYS use the bundled script for hook validation. Do NOT manually check shebangs, permissions, or run bash -n.
-
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hook_validator.py --settings .claude/settings.json --json
-```
-
-Or to validate a specific hooks directory:
-```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hook_validator.py --hooks-dir <path> --json
-```
-
-The script checks all hook scripts for: missing shebang, missing `set -euo pipefail`, unquoted variables (injection risk), missing executable permissions, references to non-existent files, syntax errors (via `bash -n`), and stdin handling for hooks that produce JSON decisions.
 
 ### Step 3: Coverage Analysis
 
