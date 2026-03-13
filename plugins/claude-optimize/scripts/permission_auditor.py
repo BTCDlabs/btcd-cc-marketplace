@@ -311,8 +311,8 @@ def main():
             for r in results:
                 summaries.append({
                     "settings_path": r.get("settings_path"),
-                    "score": r.get("score", {}).get("total", 0),
-                    "grade": r.get("score", {}).get("grade", "F"),
+                    "score": r.get("score", 0),
+                    "grade": r.get("grade", "F"),
                     "env_protection": r.get("env_protection", {}),
                     "precompact_hook": r.get("precompact_hook", {}),
                 })
