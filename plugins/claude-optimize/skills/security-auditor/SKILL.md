@@ -25,67 +25,55 @@ Read these files (all in parallel):
 
 ### Step 2: Permission Analysis
 
-#### Deny Rules Assessment
-Check `.claude/settings.json` for `deny` array. Score based on presence of recommended deny rules.
+ALWAYS use the bundled script for permission auditing. Do NOT manually parse settings.json or check deny/allow rules.
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/permission_auditor.py --json
+```
+
+The script automatically:
+- Checks for all critical and high-priority deny rules from the deny-rule-patterns reference
+- Flags overly broad allow patterns (Bash(*), Bash(rm:*), Bash(sudo:*), etc.)
+- Checks for sensitive file protection
+- Calculates a security score (0-100) with grade
 
 Reference: `${CLAUDE_PLUGIN_ROOT}/skills/security-auditor/references/deny-rule-patterns.md`
 
-Essential deny rules that should exist:
-- `rm -rf /` and variants
-- `chmod 777`
-- Commands that read/write `.env`, `.key`, credential files
-- `curl | bash` and `wget | sh` pipe-to-shell patterns
-- `git push --force` to main/master
-- `DROP TABLE`, `DELETE FROM` without WHERE
-
-#### Allow Rules Assessment
-Check `allow` array for overly broad patterns:
-- **Critical**: `Bash(*)` allows ALL bash commands - extremely dangerous
-- **Warning**: `Bash(rm:*)` allows all rm variants
-- **Warning**: `Bash(curl:*)` without restrictions
-- **OK**: `Bash(git:*)` - scoped to git commands
-- **OK**: `Bash(npm:*)` - scoped to npm
-
 ### Step 3: MCP Server Security
 
-For each MCP server in `.mcp.json`:
+ALWAYS use the bundled script for MCP security analysis. Do NOT manually parse .mcp.json or check trust settings.
 
-1. **Transport security**: Is it using HTTPS? (for HTTP-based servers)
-2. **Authentication**: Does it require API keys or tokens?
-3. **Trust level**: Is it from a known/trusted source?
-4. **Scope**: What tools does it expose? Are they overly broad?
-5. **Environment variables**: Are secrets properly externalized?
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/mcp_health_check.py --json
+```
 
-Check `enableAllProjectMcpServers` - if `true`, flag as critical risk.
+The script automatically checks: command existence, environment variables, tool count estimation, token impact, AND `enableAllProjectMcpServers` trust setting in settings.json (flagged as critical if true).
 
 Reference: `${CLAUDE_PLUGIN_ROOT}/skills/security-auditor/references/mcp-security-checklist.md`
 
 ### Step 4: Hook Security
 
-For each hook script:
-1. Does it properly validate input?
-2. Does it use `set -euo pipefail`?
-3. Does it have injection vulnerabilities (unquoted variables in commands)?
-4. Does it write to sensitive locations?
-5. Does it have appropriate timeouts?
+ALWAYS use the bundled script for hook security validation. Do NOT manually inspect scripts.
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hook_validator.py --settings .claude/settings.json --json
+```
+
+The script checks for: input validation, `set -euo pipefail`, injection vulnerabilities, missing permissions, syntax errors, and file reference validity.
 
 ### Step 5: .env Protection
 
-Check if there are hooks preventing writes to sensitive files:
-- `.env`, `.env.*`
-- `*.key`, `*.pem`, `*.cert`
-- `credentials.*`, `secrets.*`
-- `~/.ssh/*`
-
-If no protection hooks exist, recommend creating one.
+The permission auditor script (Step 2) automatically checks for .env protection hooks. Review the `env_protection` field in the output. If `has_protection` is false, recommend creating a PreToolUse hook for Write/Edit that blocks writes to sensitive files (.env, *.key, *.pem, *.cert, credentials.*, secrets.*).
 
 ### Step 6: Skill/Agent Prompt Injection Scan
 
-For each skill and agent markdown file:
-- Check for instructions that could bypass safety (e.g., "ignore previous instructions")
-- Check for instructions that access credential files
-- Check for overly broad tool permissions
-- Check for instructions that disable hooks or verification
+ALWAYS use the bundled script for prompt injection scanning. Do NOT manually read and scan skill/agent files.
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/prompt_injection_scanner.py --auto-discover --json
+```
+
+The script automatically scans all SKILL.md and agent .md files for: safety bypass instructions, credential access patterns, overly broad tool permissions, and hook/verification disable patterns.
 
 ### Step 7: Generate Security Scorecard
 

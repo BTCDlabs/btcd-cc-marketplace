@@ -11,6 +11,7 @@ allowed-tools:
   - Bash(head:*)
   - Bash(tail:*)
   - Bash(cat:*)
+  - Bash(python3:*)
   - AskUserQuestion
 ---
 
@@ -26,28 +27,40 @@ Use the **context-optimizer** skill to perform all analysis:
 
 ### Phase 1: Measure Current Token Load
 
-1. Measure all CLAUDE.md file sizes (lines, estimated tokens)
-2. Measure all skill description sizes
-3. Count MCP tools (always-loaded vs deferred)
-4. Check for PreCompact hook
+ALWAYS use the bundled scripts for measurement. Do NOT estimate tokens manually or write ad-hoc counting code.
+
+```bash
+# Measure CLAUDE.md token load
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/token_counter.py --claude-md --json --summary
+
+# Analyze skill descriptions
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/skill_analyzer.py --auto-discover --json
+
+# Check MCP tool count and token impact
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/mcp_health_check.py --json
+```
+
+Also check for PreCompact hook presence:
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/permission_auditor.py --json
+```
+Review the `precompact_hook` field in the output.
 
 Reference: `${CLAUDE_PLUGIN_ROOT}/skills/context-optimizer/references/compaction-strategies.md`
 
 ### Phase 2: Identify Reduction Opportunities
 
-For each CLAUDE.md file:
-1. Find redundant instructions (duplicates default Claude behavior)
-2. Find verbose content (paragraphs that could be bullet points)
-3. Find stale content (references to things that no longer exist)
-4. Find duplicate content (same info in multiple files)
+Use the CLAUDE.md validator to find stale references:
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/claude_md_validator.py --auto-discover --json
+```
 
-For skills:
-1. Flag descriptions over 150 words
-2. Identify descriptions with implementation details (should be in body)
+The skill_analyzer output (Phase 1) already flags descriptions over 150 words and rates trigger quality. The mcp_health_check output (Phase 1) already flags excessive tool counts and shows which servers could benefit from deferred loading.
 
-For MCP:
-1. Identify servers that could use deferred loading
-2. Flag excessive tool counts
+Additionally, Read each CLAUDE.md file and identify:
+1. Redundant instructions (duplicates default Claude behavior)
+2. Verbose content (paragraphs that could be bullet points)
+3. Duplicate content (same info in multiple files)
 
 ### Phase 3: Generate Report
 

@@ -12,6 +12,7 @@ allowed-tools:
   - Bash(jq:*)
   - Bash(bash:*)
   - Bash(test:*)
+  - Bash(python3:*)
   - AskUserQuestion
   - WebSearch
 ---
@@ -28,13 +29,25 @@ Use the **security-auditor** skill to perform all security checks:
 
 ### Phase 1: Full Security Analysis
 
-Run all checks from the security-auditor skill:
-1. Permission analysis (allow/deny rules)
-2. MCP server security assessment
-3. Hook security review
-4. .env protection verification
-5. Skill/agent prompt injection scan
-6. Configuration security check
+ALWAYS use the bundled scripts for automated checks. Do NOT manually parse settings.json or check deny rules.
+
+```bash
+# Permission and deny rule audit
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/permission_auditor.py --json
+
+# Hook script security validation
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hook_validator.py --settings .claude/settings.json --json
+
+# MCP server health and security
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/mcp_health_check.py --json
+```
+
+```bash
+# Prompt injection scan across all skills and agents
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/prompt_injection_scanner.py --auto-discover --json
+```
+
+The permission_auditor output also includes `env_protection` (hook coverage for sensitive files) and `precompact_hook` status. Review those fields for posture assessment.
 
 Reference files:
 - `${CLAUDE_PLUGIN_ROOT}/skills/security-auditor/references/deny-rule-patterns.md`

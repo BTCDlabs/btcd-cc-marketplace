@@ -49,11 +49,18 @@ Score on 6 dimensions (total 100):
 
 ### Step 3: Cross-Reference with Codebase
 
-Verify accuracy of the CLAUDE.md content:
-- Do documented commands match `package.json` scripts / `Makefile` targets?
-- Do referenced file paths actually exist?
-- Do architecture descriptions match actual directory structure?
-- Are documented tech stack versions current?
+ALWAYS use the bundled script for CLAUDE.md validation. Do NOT manually parse package.json, check file paths, or verify commands.
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/claude_md_validator.py --auto-discover --json
+```
+
+The script automatically:
+- Extracts commands from code blocks and inline backticks
+- Validates commands against `package.json` scripts and `Makefile` targets
+- Checks if all referenced file paths exist
+- Scores each CLAUDE.md on the 6-dimension rubric (commands, architecture, patterns, conciseness, currency, actionability)
+- Reports invalid commands and missing paths
 
 ### Step 4: Identify Improvements
 

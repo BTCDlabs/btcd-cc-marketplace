@@ -18,6 +18,7 @@ allowed-tools:
   - Bash(node:*)
   - Bash(npm:*)
   - Bash(npx:*)
+  - Bash(python3:*)
   - AskUserQuestion
 ---
 
@@ -31,10 +32,13 @@ You are the Claude Optimize initialization wizard. Your job is to set up a new C
 
 ### Phase 1: Detection
 
-Use the **codebase-analyzer** skill to detect the project's technology stack:
-- Language, framework, package manager
-- CI/CD system, test framework, linter/formatter
-- Existing Claude Code configuration (if any)
+ALWAYS use the bundled script for codebase detection. Do NOT manually check file patterns.
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/codebase_detector.py --json
+```
+
+The script detects: languages, frameworks, package managers, CI/CD, build tools, external services (with MCP suggestions), and existing Claude Code configuration.
 
 Present the detected profile to the user.
 
@@ -42,7 +46,7 @@ Present the detected profile to the user.
 
 If no CLAUDE.md exists:
 1. Use the **claude-md-manager** skill's templates to generate an appropriate CLAUDE.md
-2. Fill in detected values (commands from package.json/Makefile, architecture from directory structure)
+2. Fill in values from the codebase_detector output (detected commands, architecture, tools)
 3. Present the generated content for user approval
 4. Write the file only after approval
 

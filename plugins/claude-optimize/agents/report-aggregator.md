@@ -11,6 +11,7 @@ tools:
   - Glob
   - Bash(wc:*)
   - Bash(cat:*)
+  - Bash(python3:*)
 ---
 
 # Report Aggregator Agent
@@ -57,4 +58,10 @@ Generate a unified report with:
 5. Quick wins (easy + high impact)
 6. Deep dive recommendations (which /optimize: commands to run)
 
-Prioritize actions by: (score improvement * weight) / effort
+ALWAYS use the bundled script for score aggregation. Do NOT calculate weighted scores manually.
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/score_aggregator.py --scores '{"claude_md_quality": XX, "security_posture": XX, "context_efficiency": XX, "hook_coverage": XX, "skill_quality": XX, "memory_hygiene": XX, "mcp_health": XX, "codebase_alignment": XX}' --json
+```
+
+Replace XX values with actual scores. The script calculates weighted totals, assigns grades, and prioritizes actions by: (score improvement * weight) / effort

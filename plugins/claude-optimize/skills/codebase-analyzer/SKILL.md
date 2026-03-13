@@ -13,122 +13,30 @@ Analyzes a project's codebase to detect its technology stack, existing Claude Co
 
 ## Detection Strategy
 
-Run all detection phases in parallel where possible. Use Glob and Read tools - avoid Bash unless necessary.
+ALWAYS use the bundled script for codebase detection. Do NOT manually check file patterns or parse dependency files.
 
-## Phase 1: Language & Framework Detection
+## Phase 1: Technology Stack Detection
 
-Check for these indicators (check all in parallel):
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/codebase_detector.py --json
+```
 
-### Package/Dependency Files
-| File | Indicates |
-|------|-----------|
-| `package.json` | Node.js/JavaScript/TypeScript |
-| `tsconfig.json` | TypeScript specifically |
-| `requirements.txt`, `pyproject.toml`, `setup.py`, `Pipfile` | Python |
-| `Cargo.toml` | Rust |
-| `go.mod` | Go |
-| `Gemfile` | Ruby |
-| `pom.xml`, `build.gradle`, `build.gradle.kts` | Java/Kotlin |
-| `*.csproj`, `*.sln` | C#/.NET |
-| `Package.swift` | Swift |
-| `composer.json` | PHP |
-| `mix.exs` | Elixir |
-| `pubspec.yaml` | Dart/Flutter |
+The script automatically detects:
+- **Languages**: From dependency/config files (package.json, requirements.txt, Cargo.toml, go.mod, etc.)
+- **Frameworks**: From config files (next.config.*, angular.json, etc.) and dependency contents (django, flask, spring, etc.)
+- **Package Managers**: From lock files (bun.lock, yarn.lock, package-lock.json, etc.)
+- **CI/CD**: From config files (.github/workflows/, .gitlab-ci.yml, Jenkinsfile, etc.)
+- **Build/Test Tools**: Jest, pytest, ESLint, Prettier, Docker, Make, etc.
+- **External Services**: Stripe, AWS, Supabase, Sentry, etc. with MCP server suggestions
+- **Claude Code Config**: CLAUDE.md files, settings, commands, skills, agents, MCP servers, plugins
 
-### Framework Detection
-| Indicator | Framework |
-|-----------|-----------|
-| `next.config.*` | Next.js |
-| `nuxt.config.*` | Nuxt |
-| `angular.json` | Angular |
-| `svelte.config.*` | SvelteKit |
-| `remix.config.*` | Remix |
-| `astro.config.*` | Astro |
-| `vite.config.*` | Vite |
-| `webpack.config.*` | Webpack |
-| `django` in requirements | Django |
-| `flask` in requirements | Flask |
-| `fastapi` in requirements | FastAPI |
-| `rails` in Gemfile | Ruby on Rails |
-| `spring` in pom.xml | Spring Boot |
-| `actix` or `axum` in Cargo.toml | Rust web framework |
+## Phase 2: Environment Inventory
 
-### Package Manager Detection
-| Indicator | Package Manager |
-|-----------|-----------------|
-| `bun.lock`, `bun.lockb` | bun |
-| `pnpm-lock.yaml` | pnpm |
-| `yarn.lock` | yarn |
-| `package-lock.json` | npm |
-| `uv.lock` | uv |
-| `poetry.lock` | poetry |
-| `Pipfile.lock` | pipenv |
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/env_inventory.py --json
+```
 
-### CI/CD Detection
-| Indicator | CI/CD System |
-|-----------|-------------|
-| `.github/workflows/` | GitHub Actions |
-| `.gitlab-ci.yml` | GitLab CI |
-| `Jenkinsfile` | Jenkins |
-| `.circleci/` | CircleCI |
-| `.travis.yml` | Travis CI |
-| `bitbucket-pipelines.yml` | Bitbucket Pipelines |
-
-### Build/Test Tools
-| Indicator | Tool |
-|-----------|------|
-| `jest.config.*`, `vitest.config.*` | Jest/Vitest |
-| `pytest.ini`, `conftest.py`, `pyproject.toml` with pytest | pytest |
-| `.eslintrc*`, `eslint.config.*` | ESLint |
-| `.prettierrc*` | Prettier |
-| `biome.json` | Biome |
-| `Makefile` | Make |
-| `Dockerfile`, `docker-compose.*` | Docker |
-| `terraform/`, `*.tf` | Terraform |
-| `k8s/`, `kubernetes/` | Kubernetes |
-
-### External Services & APIs
-| Indicator | Service | Informs |
-|-----------|---------|---------|
-| `stripe` in deps | Stripe payments | context7 MCP |
-| `@aws-sdk/*` in deps | AWS infrastructure | AWS MCP |
-| `@supabase/supabase-js` in deps | Supabase backend | Supabase MCP |
-| `@sentry/*` in deps | Sentry error tracking | Sentry MCP |
-| `@anthropic-ai/sdk` in deps | Anthropic API | context7 MCP |
-| GitHub remote URL | GitHub hosting | GitHub MCP |
-| Linear issue refs (ABC-123) | Linear issues | Linear MCP |
-| Slack webhook URLs | Slack integration | Slack MCP |
-| OpenAPI/Swagger specs | API documentation | API doc skills |
-
-### Documentation Patterns
-| Indicator | Pattern |
-|-----------|---------|
-| `openapi.yaml`, `swagger.json` | API documentation |
-| JSDoc annotations | JavaScript docs |
-| Docstrings in Python | Python docs |
-| `docs/` directory | Documentation site |
-
-## Phase 2: Claude Code Configuration Detection
-
-Check for existing Claude Code setup:
-
-### Configuration Files
-- `.claude/settings.json` - permissions, hooks, deny rules
-- `.claude/settings.local.json` - personal settings
-- `CLAUDE.md` - project instructions (also check `.claude.md`, `.claude.local.md`)
-- `.claude/commands/*.md` - existing commands
-- `.claude/skills/*/SKILL.md` - existing skills
-- `.claude/agents/*.md` - existing agents
-- `.mcp.json` - MCP server configuration
-
-### Memory Files
-- `~/.claude/projects/` - find project-specific directory
-- Check for `memory/` subdirectory with `.md` files
-- Check for session logs (`*.jsonl` files)
-
-### Installed Plugins
-- Read `~/.claude/settings.json` for `enabledPlugins` list
-- Check for plugin conflicts with claude-optimize
+The script catalogs all existing Claude Code components: skills, agents, hooks, MCP servers, and memory files.
 
 ## Phase 3: Output Format
 

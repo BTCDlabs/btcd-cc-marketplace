@@ -60,45 +60,31 @@ This outputs tool usage, bash commands, file edits/reads, glob/grep patterns, MC
 
 ### Agent 2: Environment Inventory
 
-Read and catalog everything currently configured:
+ALWAYS use the bundled script for environment inventory. Do NOT manually glob for skills, agents, hooks, or MCP servers.
 
-**Skills:**
-- Glob `.claude/skills/*/SKILL.md` (project skills)
-- Glob `~/.claude/skills/*/SKILL.md` (personal skills)
-- Read plugin-provided skills from installed plugins
-- For each: extract name, description, source (project/personal/plugin)
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/env_inventory.py --json
+```
 
-**Agents:**
-- Glob `.claude/agents/*.md` and plugin agent directories
-- For each: extract name, description, tools list
+The script catalogs all skills (with description word counts), agents, hooks, MCP servers, and memory files from both project and user directories. It returns a complete structured inventory with source annotations.
 
-**Hooks:**
-- Read `.claude/settings.json` and `.claude/settings.local.json` for hook configurations
-- Read plugin `hooks.json` files
-- Check for hookify installation: Glob `.claude/hookify.*.local.md`
-- For each hook: extract event type, trigger pattern, action
-
-**MCP Servers:**
-- Read `.mcp.json`
-- For each: extract name, command, transport type
-
-Return a complete inventory with source annotations.
+Return the full script output.
 
 ### Agent 3: Codebase Profile
 
-Use the **codebase-analyzer** skill to detect:
-- Project type and primary language
-- Framework(s) in use
-- Package manager
-- CI/CD system
-- Test framework
-- Linter/formatter configuration
+ALWAYS use the bundled scripts. Do NOT manually check file patterns or parse settings.
 
-Also check:
-- Is `hookify` installed? (Glob for `.claude/hookify.*.local.md` or check plugin list)
-- Are there existing deny rules in settings?
+```bash
+# Detect project technology stack
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/codebase_detector.py --json
 
-Return the full codebase profile.
+# Check security posture (includes deny rules and plugin detection)
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/permission_auditor.py --json
+```
+
+The codebase_detector output includes: languages, frameworks, package managers, CI/CD, build tools, external services, and installed plugins (including hookify). The permission_auditor output includes deny rule analysis.
+
+Return the combined output.
 
 ## Phase 2: Analyze
 
@@ -273,7 +259,7 @@ For each approved proposal, in priority order:
 ### Removals
 
 1. Show exactly what will be deleted
-2. Verify no dependencies (Grep for references in all config/skill/agent files)
+2. Verify no dependencies using Grep tool to search for references in config/skill/agent files
 3. If dependencies found, inform user and ask how to proceed
 4. Delete approved files
 5. Note how to restore if needed

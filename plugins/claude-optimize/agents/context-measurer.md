@@ -13,6 +13,7 @@ tools:
   - Bash(cat:*)
   - Bash(head:*)
   - Bash(tail:*)
+  - Bash(python3:*)
 ---
 
 # Context Measurer Agent
@@ -22,31 +23,49 @@ You are a specialized context efficiency analyzer for Claude Code environments. 
 ## What to Measure
 
 ### 1. CLAUDE.md Files
-Find all CLAUDE.md variants using Glob:
-- `CLAUDE.md`, `.claude.md`, `.claude.local.md`
-- Nested variants in subdirectories
 
-For each:
-- Line count
-- Word count
-- Estimated token count (words * 1.3)
-- Identify redundant/verbose sections
+ALWAYS use the bundled script. Do NOT estimate tokens manually.
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/token_counter.py --claude-md --json --summary
+```
+
+For individual files, use:
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/token_counter.py <file> --json
+```
+
+Review the output to identify redundant/verbose sections.
 
 ### 2. Skill Descriptions
-Read all SKILL.md files (project + plugin):
-- Extract YAML `description` field
-- Count words in each description
-- Flag descriptions > 150 words
-- Flag descriptions < 20 words
+
+ALWAYS use the bundled script. Do NOT manually parse YAML or count words.
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/skill_analyzer.py --auto-discover --json
+```
+
+The script extracts descriptions, counts words, and flags bloated/vague descriptions.
 
 ### 3. MCP Tool Count
-Read `.mcp.json`:
-- Count configured servers
-- Estimate tools per server
-- Note which use deferred loading
+
+ALWAYS use the bundled script. Do NOT manually parse .mcp.json or estimate tools.
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/mcp_health_check.py --json
+```
+
+The script estimates tools per server from a built-in catalog and reports token impact.
 
 ### 4. Compaction Resilience
-Check for PreCompact hook in settings.json.
+
+Use the permission auditor to check for PreCompact hook presence:
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/permission_auditor.py --json
+```
+
+Check the `precompact_hook` field in the output. If `has_precompact_hook` is false, recommend adding one.
 
 ## Output Format
 

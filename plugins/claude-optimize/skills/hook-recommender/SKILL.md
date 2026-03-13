@@ -36,21 +36,20 @@ For each hook:
 - Timeout > 5s: Info (consider if this is necessary)
 - Timeout <= 5s: OK
 
-#### Error Detection
-Check hook scripts for common issues:
-- Missing shebang (`#!/bin/bash` or `#!/usr/bin/env bash`)
-- Missing `set -euo pipefail`
-- Unquoted variables in commands (injection risk)
-- Missing executable permission
-- References to non-existent files
-- Syntax errors (run `bash -n <script>` for bash scripts)
+#### Error Detection and Functionality Test
 
-#### Functionality Test
-For each hook script:
-- Does the script exist at the referenced path?
-- Is it executable?
-- Does it handle stdin properly (for hooks that receive JSON input)?
-- Does it produce valid output format (JSON for blocking hooks)?
+ALWAYS use the bundled script for hook validation. Do NOT manually check shebangs, permissions, or run bash -n.
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hook_validator.py --settings .claude/settings.json --json
+```
+
+Or to validate a specific hooks directory:
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hook_validator.py --hooks-dir <path> --json
+```
+
+The script checks all hook scripts for: missing shebang, missing `set -euo pipefail`, unquoted variables (injection risk), missing executable permissions, references to non-existent files, syntax errors (via `bash -n`), and stdin handling for hooks that produce JSON decisions.
 
 ### Step 3: Coverage Analysis
 

@@ -71,39 +71,33 @@ Bloat is things that exist but aren't being used. Before running bloat detection
 
 **Read the heuristics**: `${CLAUDE_PLUGIN_ROOT}/skills/discover-analyzer/references/bloat-heuristics.md`
 
-### Skill Usage Cross-Reference
+### Usage Cross-Reference
 
-For each skill in the inventory:
-1. Search session assistant messages for the skill name
-2. Check if session tool-call patterns match the skill's described workflow
-3. Check if user messages contain the skill's trigger phrases
+Use the session analyzer script output and the environment inventory to cross-reference usage. Do NOT manually search session JSONL files.
 
-Zero matches across 15+ sessions → "potentially unused"
+```bash
+# Get environment inventory
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/env_inventory.py --json
 
-### MCP Server Usage Cross-Reference
+# Get session usage data (already run by session-analyzer skill)
+python3 ${CLAUDE_PLUGIN_ROOT}/skills/session-analyzer/scripts/analyze_sessions.py --max-sessions 30
+```
 
-For each MCP server in `.mcp.json`:
-1. Count tool calls matching `mcp__<server-name>__*` in session data
-2. Zero calls across 15+ sessions → "potentially unused"
-
-### Agent Usage Cross-Reference
-
-For each agent in the inventory:
-1. Search for `Agent` tool_use blocks mentioning the agent name
-2. Zero references across 15+ sessions → "potentially unused"
-
-### Hook Activity Cross-Reference
-
-For each hook:
-1. Check if any session tool calls would match the hook's trigger pattern
-2. If no session activity would ever trigger the hook → "potentially unnecessary"
+Cross-reference the two outputs:
+- **Skills**: Match skill names against session assistant messages and tool-call patterns. Zero matches across 15+ sessions → "potentially unused"
+- **MCP Servers**: Match `mcp__<server-name>__*` patterns in the MCP tool calls section. Zero calls across 15+ sessions → "potentially unused"
+- **Agents**: Match agent names in the tool usage section (Agent tool_use). Zero references across 15+ sessions → "potentially unused"
+- **Hooks**: Match hook trigger patterns (event + matcher) against session tool call types. If no session activity would ever trigger the hook → "potentially unnecessary"
 
 ### Redundancy Check
 
-Compare all skill descriptions pairwise:
-1. Tokenize into keywords, remove stop words
-2. Calculate similarity (Jaccard or keyword overlap)
-3. Flag pairs with >70% overlap as potentially redundant
+ALWAYS use the bundled script for skill redundancy detection. Do NOT manually tokenize descriptions or calculate similarity.
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/skill_analyzer.py --auto-discover --threshold 0.7 --json
+```
+
+The script automatically tokenizes descriptions, removes stop words, calculates Jaccard similarity, and flags pairs with >70% overlap.
 
 ### Safety Exemptions
 

@@ -19,38 +19,26 @@ You are the Claude Optimize skill analyzer. Assess the skill ecosystem in this C
 
 ## Workflow
 
-### Phase 1: Inventory Skills
+### Phase 1: Inventory and Assess Skills
 
-Discover all skills from:
-- `.claude/skills/*/SKILL.md` (project skills)
-- `~/.claude/skills/*/SKILL.md` (personal skills)
-- Plugin skills (from installed plugins)
+ALWAYS use the bundled script for skill inventory and trigger quality assessment. Do NOT manually glob for skills, count words, or assess trigger quality.
 
-For each skill, extract:
-- Name, description, version
-- Description word count
-- Allowed tools
-- Whether it's user-invocable or auto-triggering
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/skill_analyzer.py --auto-discover --json
+```
 
-### Phase 2: Trigger Quality Assessment
+The script automatically:
+- Discovers all skills from project, personal, and plugin directories
+- Extracts name, description, word count from YAML frontmatter
+- Assesses trigger quality (excellent/good/fair/poor) based on:
+  - Word count thresholds (flag >150 words bloated, <20 words vague)
+  - Presence of "do not trigger" clauses
+  - Presence of explicit trigger conditions
+- Detects overlapping descriptions via Jaccard similarity (>70% threshold)
 
-For each skill description, evaluate:
-
-| Quality | Criteria |
-|---------|----------|
-| Excellent | Specific trigger conditions, includes "when" and "do not trigger" |
-| Good | Clear purpose, reasonable trigger scope |
-| Fair | Vague, could trigger on unrelated tasks |
-| Poor | Too broad or too narrow, will mis-trigger |
+### Phase 2: Review Results
 
 **Key insight**: Claude tends to "undertrigger" skills — not using them when they'd be useful. Descriptions should be slightly "pushy" and list concrete trigger phrases/contexts, not just state what the skill does.
-
-Flag:
-- Descriptions > 150 words (bloated, wastes context)
-- Descriptions < 20 words (too vague for reliable triggering)
-- Descriptions without "do not trigger" clauses (risk of false positives)
-- Descriptions that only say what the skill does, not when to use it
-- Overlapping triggers between skills
 
 ### Phase 3: Gap Analysis
 

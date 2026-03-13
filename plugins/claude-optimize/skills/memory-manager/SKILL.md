@@ -22,13 +22,25 @@ Find the project's memory directory:
 
 Use Glob to find all directories matching the current project, then read all `.md` files in the `memory/` subdirectory. Also check for `MEMORY.md` which is always loaded into context.
 
-### Step 2: Parse Each Memory File
+### Step 2: Parse and Analyze Memory Files
 
-For each memory file, extract:
-- **File name and path**
-- **Line count and approximate token count** (lines * 4 tokens avg)
-- **Section headers** (## headings)
-- **Individual entries** (bullet points or paragraphs under headers)
+ALWAYS use the bundled scripts for memory file analysis. Do NOT manually count lines, estimate tokens, or grep for staleness.
+
+**For parsing and token counting:**
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/env_inventory.py --component memory --json
+```
+
+**For staleness detection and duplicate finding:**
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/memory_staleness.py --check-duplicates --json
+```
+
+The staleness script automatically:
+- Extracts file paths, function names, and package names from each entry
+- Searches the codebase to verify references still exist
+- Calculates staleness scores (0-25)
+- Detects exact and near-duplicate entries via Jaccard similarity
 
 ### Step 3: Score Each Entry
 
@@ -40,7 +52,7 @@ Score entries on four dimensions (each 0-25, total 0-100):
 - 5: References patterns with no evidence of current relevance
 - 0: References removed/renamed files, deprecated APIs, or old patterns
 
-**How to check**: Grep for file paths, function names, or package names mentioned in the entry. If they don't exist in the codebase, the entry is likely stale.
+The staleness script (Step 2) provides automated staleness scores. For accuracy, relevance, and actionability, use the scoring rubric below.
 
 #### Accuracy (0-25)
 - 25: Statement is verifiably correct by reading referenced code

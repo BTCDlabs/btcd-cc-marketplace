@@ -30,10 +30,15 @@ Use the **hook-recommender** skill to perform all analysis:
 
 ### Phase 1: Analysis
 
-1. Inventory all existing hooks (project, personal, plugin)
-2. Check health of each hook (timeout, errors, injection risks)
-3. Detect missing hooks based on project type
-4. Analyze session logs for patterns that hooks could automate
+ALWAYS use the bundled scripts for hook analysis. Do NOT manually check hook health or validate scripts.
+
+```bash
+# Inventory hooks and validate scripts
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/env_inventory.py --component hooks --json
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hook_validator.py --settings .claude/settings.json --json
+```
+
+Then use the hook-recommender skill for coverage analysis and recommendations based on project type.
 
 Reference: `${CLAUDE_PLUGIN_ROOT}/skills/hook-recommender/references/hook-patterns.md`
 
@@ -51,6 +56,6 @@ For each recommended hook, offer to:
 ## Rules
 
 1. NEVER modify hooks without user approval
-2. Test hook scripts with `bash -n` before recommending
+2. Validate hook scripts using `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hook_validator.py` before recommending
 3. Always set reasonable timeouts (5-30s)
 4. Use `${CLAUDE_PLUGIN_ROOT}` for plugin hook paths

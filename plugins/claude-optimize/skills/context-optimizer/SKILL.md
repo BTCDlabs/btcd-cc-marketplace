@@ -22,18 +22,22 @@ Claude Code reserves a buffer of ~33K-45K tokens for system instructions, CLAUDE
 
 ### Step 1: Measure CLAUDE.md Token Load
 
-Read all CLAUDE.md variants and estimate token count:
-- `CLAUDE.md` (project root)
-- `.claude.md`, `.claude.local.md`
-- Nested `CLAUDE.md` files in subdirectories (discovered via Glob)
+ALWAYS use the bundled script for token measurement — it provides deterministic, consistent results across all runs. Do NOT estimate tokens manually or generate ad-hoc counting code.
 
-**Token estimation**: Count characters, divide by 4 (rough approximation). For precise count, count words and multiply by 1.3.
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/token_counter.py --claude-md --json
+```
 
-**Targets**:
-- Excellent: <1000 tokens (<200 lines)
-- Good: 1000-2000 tokens (200-400 lines)
-- Warning: 2000-3000 tokens (400-600 lines)
-- Critical: >3000 tokens (>600 lines)
+For specific files:
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/token_counter.py <file1> <file2> --json --summary
+```
+
+The script automatically applies word-based token estimation (words × 1.3) and classifies into bands:
+- Excellent: <500 tokens
+- Good: 500-1500 tokens
+- Warning: 1500-3000 tokens
+- Critical: >3000 tokens
 
 ### Step 2: Analyze Instruction Density
 
@@ -56,24 +60,31 @@ For each CLAUDE.md file, evaluate:
 
 ### Step 3: Analyze Skill Description Sizes
 
-Read all SKILL.md files (project + plugins). For each:
-- Measure description field length (from YAML frontmatter)
-- Descriptions are loaded into context for trigger matching
-- Target: <100 words per description
+ALWAYS use the bundled script for skill description analysis. Do NOT manually count words or parse YAML frontmatter.
 
-Flag descriptions that are:
-- Over 150 words (bloated)
-- Under 20 words (too vague for good triggering)
-- Contain implementation details (should be in body, not description)
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/skill_analyzer.py --auto-discover --json
+```
+
+The script automatically:
+- Parses YAML frontmatter from all SKILL.md files
+- Counts description words and classifies quality (excellent/good/warning/bloated)
+- Flags descriptions over 150 words or under 20 words
+- Detects overlapping descriptions via Jaccard similarity
 
 ### Step 4: Analyze MCP Tool Count
 
-Read `.mcp.json` and check:
-- Total number of MCP servers configured
-- Whether Tool Search / deferred loading is being used
-- Estimate tool count per server (if known servers)
+ALWAYS use the bundled script for MCP analysis. Do NOT manually parse .mcp.json or estimate tool counts.
 
-Each always-loaded MCP tool adds ~100-200 tokens to context. Deferred tools add ~20 tokens (just the search entry).
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/mcp_health_check.py --json
+```
+
+The script automatically:
+- Reads all .mcp.json files (project + user)
+- Estimates tool count per server from built-in catalog
+- Calculates token impact (always-loaded: ~150 tokens/tool, deferred: ~20 tokens/tool)
+- Reports total token impact across all servers
 
 ### Step 5: Check Compaction Resilience
 

@@ -25,10 +25,16 @@ For each server, record:
 
 ### Step 2: Health Check
 
-For each configured server:
-1. **Existence check**: Does the command exist? (use `which` or `command -v`)
-2. **Dependency check**: Are required packages installed?
-3. **Configuration check**: Are required env vars set?
+ALWAYS use the bundled script for MCP health checks. Do NOT manually run `which`, `command -v`, or check env vars.
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/mcp_health_check.py --json
+```
+
+The script checks each configured server for:
+1. **Existence check**: Command exists on system (via `which`)
+2. **Dependency check**: Required packages are reachable
+3. **Configuration check**: Required env vars are set
 
 ### Step 3: Stack-Based Recommendations
 
@@ -38,10 +44,9 @@ Reference: `${CLAUDE_PLUGIN_ROOT}/skills/mcp-advisor/references/mcp-catalog.md`
 
 ### Step 4: Context Impact Assessment
 
-Estimate token impact of each MCP server:
-- Count tools per server (if known)
-- Classify as always-loaded vs deferred
-- Calculate estimated token cost
+The MCP health check script (Step 2) includes token impact estimates. It uses a built-in catalog of known MCP servers to estimate tool counts and calculates:
+- ~150 tokens per always-loaded tool
+- ~20 tokens per deferred tool
 
 ### Step 5: Security Assessment
 

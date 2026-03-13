@@ -10,6 +10,7 @@ allowed-tools:
   - Bash(wc:*)
   - Bash(find:*)
   - Bash(stat:*)
+  - Bash(python3:*)
   - AskUserQuestion
 ---
 
@@ -25,11 +26,17 @@ Use the **memory-manager** skill to perform all analysis:
 
 ### Phase 1: Analysis
 
-1. Discover all memory files in the project's Claude memory directory
-2. Score each entry for staleness, accuracy, relevance, actionability
-3. Identify migration candidates (entries that belong in CLAUDE.md)
-4. Find duplicates and contradictions
-5. Assess MEMORY.md line count vs 200-line limit
+ALWAYS use the bundled scripts for memory analysis. Do NOT manually count lines, estimate tokens, or grep for staleness.
+
+```bash
+# Inventory memory files with token counts
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/env_inventory.py --component memory --json
+
+# Detect stale entries and duplicates
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/memory_staleness.py --check-duplicates --json
+```
+
+Then use the memory-manager skill for scoring accuracy, relevance, and actionability (which require semantic understanding), and for identifying migration candidates.
 
 ### Phase 2: Report
 
