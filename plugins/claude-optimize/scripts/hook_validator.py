@@ -18,7 +18,6 @@ import json
 import os
 import re
 import subprocess
-import sys
 
 
 class HookIssue:
@@ -351,10 +350,6 @@ def main():
     for script in args.scripts:
         script = os.path.expanduser(script)
         all_issues[script] = validate_hook_script(script)
-
-    if not all_issues:
-        print("No scripts found to validate.", file=sys.stderr)
-        sys.exit(1)
 
     total_issues = sum(len(issues) for issues in all_issues.values())
 
